@@ -1,6 +1,25 @@
-sudo: false
+
+sudo: required
+services:
+  - docker
 language: node_js
 node_js:
-  - "8.3"
+  - "8.11"
+install:
+  - yarn --frozen-lockfile
+  - mv .env.test .env
+script:
+  - true
+after_success:
+  - |
+    if [[ $TRAVIS_BRANCH == "master" ]]; then
+      docker build -t prowl-github-app . &&
+      docker tag prowl-github-app registry.heroku.com/prowl-github-app/web &&
+      docker login -u "$HEROKU_USER" -p "$HEROKU_API_KEY" registry.heroku.com &&
+      docker push registry.heroku.com/prowl-github-app/web ||
+      exit 1
+    fi
 notifications:
-  disabled: true
+  email: false
+cache:
+  yarn: true
