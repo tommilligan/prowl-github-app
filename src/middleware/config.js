@@ -1,11 +1,11 @@
 const yaml = require("js-yaml");
 
 /**
- * Run the specified function with the given {robot, context, config}
+ * Run the specified function with the given {...prowl, config}
  * @param {function} fn Function to call on event
- * @param {object} args Takes robot and context, and adds config
+ * @param {object} args Additional params for fn
  */
-module.exports = async (fn, prowl, args) => {
+module.exports = async (fn, prowl, ...args) => {
   const { robot, context } = prowl;
   robot.log.info("fetching config");
 
@@ -29,7 +29,7 @@ module.exports = async (fn, prowl, args) => {
           ...prowl,
           config
         },
-        args
+        ...args
       );
     } catch (e) {
       robot.log.error("Error loading prowl config");

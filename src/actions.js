@@ -1,10 +1,11 @@
 const commentBodies = require("./commentBodies");
 const utils = require("./utils");
+const withConfig = require("./middleware/config");
 
 const checkDelay = 1000;
 
-const merge_pr = async (prowl, pr) => {
-  const { robot, context } = prowl;
+const merge_pr = async prowl => {
+  const { robot, context, pr } = prowl;
   robot.log.info(`merge: pr${pr.number}`);
 
   const comment = context.repo({
@@ -27,8 +28,8 @@ const merge_pr = async (prowl, pr) => {
   }
 };
 
-const pr_status = async (prowl, pr) => {
-  const { robot, context, config } = prowl;
+const pr_status = async prowl => {
+  const { robot, context, config, pr } = prowl;
   robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
 
   robot.log.info(`delaying check for ${checkDelay}ms`);
@@ -64,27 +65,27 @@ const pr_status = async (prowl, pr) => {
   return conditions;
 };
 
-const check_pr = async (prowl, pr) => {
-  const { robot, context, config } = prowl;
+const check_pr = async prowl => {
+  const { robot, context, config, pr } = prowl;
   robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
 
   robot.log.info(`delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
-  const conditions = pr_status(prowl, pr);
+  const conditions = pr_status(prowl);
   const prReady = conditions.every(condition => condition.value);
   robot.log.info(`pr: ready ${prReady}`);
   return prReady;
 };
 
-const merge_pr_if_ready = async (prowl, pr) => {
-  if (await check_pr(prowl, pr)) {
-    return merge_pr(prowl, prCheck);
+const merge_pr_if_ready = async prowl => {
+  if (await check_pr(prowl)) {
+    return merge_pr(prowl);
   }
 };
 
-const comment_command = async prowl => {
-  const { robot, context, config } = prowl;
+const pr_comment = async prowl => {
+  const { robot, context, config, pr } = prowl;
   const { issue, comment } = context.payload;
   if (issue.pull_request) {
     // if this is a pull request
@@ -111,7 +112,7 @@ const comment_command = async prowl => {
             });
             context.github.issues.createComment(params);
 
-            merge_pr_if_ready(prowl, pr);
+            merge_pr_if_ready(prowl);
           } else {
             const params = context.issue({
               body: commentBodies.unauthorized(comment.user.login)
@@ -121,7 +122,7 @@ const comment_command = async prowl => {
           break;
         }
         case "status": {
-          conditions = await pr_status(prowl, pr);
+          conditions = await pr_status(prowl);
 
           const params = context.issue({
             body: commentBodies.pr_status(conditions)
@@ -147,7 +148,7 @@ const comment_command = async prowl => {
 
 module.exports = {
   check_pr,
-  comment_command,
+  pr_comment,
   merge_pr,
   merge_pr_if_ready,
   pr_status
