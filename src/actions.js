@@ -1,3 +1,4 @@
+const commentBodies = require("./commentBodies");
 const utils = require("./utils");
 
 const checkDelay = 1000;
@@ -26,7 +27,7 @@ const merge_pr = async (prowl, pr) => {
   }
 };
 
-const check_pr = async (prowl, pr) => {
+const pr_status = async (prowl, pr) => {
   const { robot, context, config } = prowl;
   robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
 
@@ -59,9 +60,25 @@ const check_pr = async (prowl, pr) => {
     value: data.state === "success"
   });
 
-  const prReady = conditions.every(condition => condition.value);
   robot.log.info(conditions);
-  if (prReady) {
+  return conditions;
+};
+
+const check_pr = async (prowl, pr) => {
+  const { robot, context, config } = prowl;
+  robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
+
+  robot.log.info(`delaying check for ${checkDelay}ms`);
+  await utils.sleep(checkDelay);
+
+  const conditions = pr_status(prowl, pr);
+  const prReady = conditions.every(condition => condition.value);
+  robot.log.info(`pr: ready ${prReady}`);
+  return prReady;
+};
+
+const merge_pr_if_ready = async (prowl, pr) => {
+  if (await check_pr(prowl, pr)) {
     return merge_pr(prowl, prCheck);
   }
 };
@@ -80,28 +97,35 @@ const comment_command = async prowl => {
 
     // if this is a prowl trigger
     if (command === "prowl" && subcommand) {
+      // get the current pr
+      const { data: pr } = await context.github.pullRequests.get(
+        context.issue()
+      );
+
       switch (subcommand) {
         case "approve":
           // post a response
           if (comment.user.login === "tommilligan") {
             const params = context.issue({
-              body: `Thanks ${comment.user.login} - I'll merge when ready`
+              body: commentBodies.approvedBy(comment.user.login)
             });
             context.github.issues.createComment(params);
 
-            // get the current pr
-            const { data: pr } = await context.github.pullRequests.get(
-              context.issue()
-            );
-            check_pr(prowl, pr);
+            merge_pr_if_ready(prowl, pr);
           } else {
             const params = context.issue({
-              body: `Apologies @${
-                comment.user.login
-              } - you are not authorized to approve this PR`
+              body: commentBodies.unauthorised(comment.user.login)
             });
             context.github.issues.createComment(params);
           }
+          break;
+        case "status":
+          conditions = await pr_status(prowl, pr);
+
+          const params = context.issue({
+            body: commentBodies.pr_status(conditions)
+          });
+          context.github.issues.createComment(params);
           break;
         default:
           break;
@@ -115,5 +139,7 @@ const comment_command = async prowl => {
 module.exports = {
   check_pr,
   comment_command,
-  merge_pr
+  merge_pr,
+  merge_pr_if_ready,
+  pr_status
 };

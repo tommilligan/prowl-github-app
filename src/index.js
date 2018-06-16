@@ -35,7 +35,7 @@ module.exports = robot => {
         };
         if (sha === pr.head.sha) {
           freshness("fresh");
-          withConfig(actions.check_pr, { robot, context }, pr);
+          withConfig(actions.merge_pr_if_ready, { robot, context }, pr);
         } else {
           freshness("stale");
         }
