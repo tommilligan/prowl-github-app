@@ -1,5 +1,31 @@
+const checkDelay = 1000;
+
+function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
+
 const check_pr = async (robot, context, pr) => {
   robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
+
+  robot.log.info(`delaying check for ${checkDelay}ms`);
+  await sleep(checkDelay);
+
+  const params = context.repo({ ref: pr.head.sha });
+  const { data } = await context.github.repos.getCombinedStatusForRef(params);
+  robot.log.info(`head: pr${pr.number} ${data.state}`);
+
+  if (data.state === "success") {
+    robot.log.info("pr is ready to go");
+    const comment = context.repo({
+      number: pr.number,
+      body: "PR is ready for merge"
+    });
+    context.github.issues.createComment(comment);
+  } else {
+    robot.log.info("pr is not ready yet");
+  }
 };
 
 module.exports = robot => {
@@ -22,8 +48,10 @@ module.exports = robot => {
         context.github.issues.createComment(params);
 
         // get the current pr
-        const { data } = await context.github.pullRequests.get(context.issue());
-        check_pr(robot, context, data);
+        const { data: pr } = await context.github.pullRequests.get(
+          context.issue()
+        );
+        check_pr(robot, context, pr);
       }
     } else {
       robot.log.info("Comment was not on a PR");
