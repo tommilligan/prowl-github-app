@@ -4,15 +4,16 @@ const withConfig = require("./middleware/config");
 
 const checkDelay = 1000;
 
+const delete_pr = async prowl => {
+  const { robot, context, pr } = prowl;
+  const { ref } = pr.head;
+  robot.log.info(`${pr.url}: deleting ${ref}`);
+  return await context.github.gitdata.deleteReference(context.repo({ ref }));
+};
+
 const merge_pr = async prowl => {
   const { robot, context, pr } = prowl;
   robot.log.info(`${pr.url}: merge started`);
-
-  const comment = context.repo({
-    number: pr.number,
-    body: "PR is ready for merge"
-  });
-  context.github.issues.createComment(comment);
 
   const merge = context.repo({
     number: pr.number,
@@ -41,11 +42,13 @@ const pr_status = async prowl => {
   // check HEAD hasn't moved
   conditions.push({
     description: "HEAD is fresh",
-    value: prCheck.head.sha === pr.head.sha
+    pass: prCheck.head.sha === pr.head.sha,
+    value: pr.head.sha
   });
   // check PR is mergeable
   conditions.push({
     description: "PR is mergeable",
+    pass: !!prCheck.mergeable,
     value: prCheck.mergeable
   });
 
@@ -57,14 +60,14 @@ const pr_status = async prowl => {
   );
   conditions.push({
     description: "Commit status success",
-    value: refStatus.state === "success"
+    pass: refStatus.state === "success",
+    value: refStatus.state
   });
 
   // PR reviews
   const { data: prReviews } = await context.github.pullRequests.getReviews(
     context.repo({ number: pr.number, per_page: 100 })
   );
-  robot.log.warn(prReviews);
   const approvedReviewers = prReviews
     .filter(review => {
       const { commit_id, state } = review;
@@ -77,21 +80,18 @@ const pr_status = async prowl => {
       return approvedReviewers.includes(reviewer);
     });
   });
+  robot.log.warn(approved);
   conditions.push({
     description: "Required reviewers approved",
-    value: approved
+    pass: approved,
+    value: [config.reviewerGroups, approvedReviewers]
   });
 
   return conditions;
 };
 
-const check_pr = async prowl => {
-  const { robot, context, config, pr } = prowl;
-
-  const conditions = await pr_status(prowl);
-  const prReady = conditions.every(condition => condition.value);
-  robot.log.info(`${pr.url}: ready? ${prReady}`);
-  return prReady;
+const conditionsCheck = conditions => {
+  return conditions.every(condition => condition.pass);
 };
 
 const merge_pr_if_ready = async prowl => {
@@ -99,7 +99,14 @@ const merge_pr_if_ready = async prowl => {
   robot.log.info(`${pr.url}: delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
-  if (await check_pr(prowl)) {
+  const conditions = pr_status(prowl);
+  if (prReady) {
+    robot.log.info(`${pr.url}: ready for merge`);
+    const comment = context.repo({
+      number: pr.number,
+      body: commentBodies.merge(conditions)
+    });
+    context.github.issues.createComment(comment);
     return merge_pr(prowl);
   }
 };
@@ -130,7 +137,6 @@ const prowl_command = async (prowl, command) => {
 };
 
 module.exports = {
-  check_pr,
   prowl_command,
   merge_pr,
   merge_pr_if_ready,

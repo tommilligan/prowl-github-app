@@ -14,6 +14,10 @@ const pr_status = conditions => `Status of this PR:
 ${jsonBlock(conditions)}
 `;
 
+const merge = conditions => `PR ready for merge:
+${jsonBlock(conditions)}
+`;
+
 const unauthorized = s =>
   `Apologies @${s} - you are not authorized to action this PR`;
 
@@ -21,5 +25,6 @@ module.exports = {
   approvedBy,
   config,
   pr_status,
+  merge,
   unauthorized
 };
