@@ -2,7 +2,8 @@ const utils = require("./utils");
 
 const checkDelay = 1000;
 
-const merge_pr = async (robot, context, pr) => {
+const merge_pr = async (prowl, pr) => {
+  const { robot, context } = prowl;
   robot.log.info(`merge: pr${pr.number}`);
 
   const comment = context.repo({
@@ -25,37 +26,48 @@ const merge_pr = async (robot, context, pr) => {
   }
 };
 
-const check_pr = async (robot, context, pr) => {
+const check_pr = async (prowl, pr) => {
+  const { robot, context, config } = prowl;
   robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
 
   robot.log.info(`delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
-  // check HEAD hasn't moved
-  const { data: pr_check } = await context.github.pullRequests.get(
+  const conditions = [];
+
+  // get latest PR data
+  const { data: prCheck } = await context.github.pullRequests.get(
     context.repo({ number: pr.number })
   );
-  if (pr_check.head.sha === pr.head.sha) {
-    robot.log.info(`head is still at ${pr.head.sha}`);
 
-    // check commit is success
-    const params = context.repo({ ref: pr.head.sha });
-    const { data } = await context.github.repos.getCombinedStatusForRef(params);
+  // check HEAD hasn't moved
+  conditions.push({
+    description: "HEAD is fresh",
+    value: prCheck.head.sha === pr.head.sha
+  });
+  // check PR is mergeable
+  conditions.push({
+    description: "PR is mergeable",
+    value: prCheck.mergeable
+  });
 
-    if (data.state === "success") {
-      robot.log.info(`head is ${data.state}`);
+  // check commit is success
+  const params = context.repo({ ref: pr.head.sha });
+  const { data } = await context.github.repos.getCombinedStatusForRef(params);
+  conditions.push({
+    description: "Commit status success",
+    value: data.state === "success"
+  });
 
-      if (false) {
-        return merge_pr(robot, context, pr_check);
-      }
-    }
+  const prReady = conditions.every(condition => condition.value);
+  robot.log.info(conditions);
+  if (prReady) {
+    return merge_pr(prowl, prCheck);
   }
-
-  robot.log.info("pr is not ready yet");
 };
 
-const comment_command = async args => {
-  const { robot, context, config } = args;
+const comment_command = async prowl => {
+  const { robot, context, config } = prowl;
   const { issue, comment } = context.payload;
   if (issue.pull_request) {
     // if this is a pull request
@@ -68,8 +80,6 @@ const comment_command = async args => {
 
     // if this is a prowl trigger
     if (command === "prowl" && subcommand) {
-      const config = await actions.get_config(robot, context);
-
       switch (subcommand) {
         case "approve":
           // post a response
@@ -83,7 +93,7 @@ const comment_command = async args => {
             const { data: pr } = await context.github.pullRequests.get(
               context.issue()
             );
-            actions.check_pr(robot, context, pr);
+            check_pr(prowl, pr);
           } else {
             const params = context.issue({
               body: `Apologies @${
