@@ -9,7 +9,7 @@ const utils = require("./utils");
  */
 module.exports = async (fn, prowl, ...args) => {
   const { robot, context, pr } = prowl;
-  robot.log.info("fetching config");
+  robot.log.debug("fetching config");
 
   // Only get prowl config from default branch
   const fileref = context.repo({ path: ".prowl.yml" });
@@ -17,11 +17,11 @@ module.exports = async (fn, prowl, ...args) => {
   const { data: config_file } = result;
 
   if (config_file.type !== "file") {
-    robot.log.warning("No .prowl.yml found");
+    robot.log.warning(`${pr.url}: No .prowl.yml found`);
   } else {
-    robot.log.info("reading config");
-
     try {
+      robot.log.debug("reading config");
+
       buf = Buffer.from(config_file.content, config_file.encoding);
       const config = yaml.safeLoad(buf.toString("utf8"));
       const pr_configs = config.pull_requests;
@@ -47,11 +47,16 @@ module.exports = async (fn, prowl, ...args) => {
       // summarise configs
       const final_config = pr_configs_matched.reduce(
         (acc, config) => {
+          const r = acc.reviewerGroups.slice();
+          const { reviewers } = config.constrain;
+          if (reviewers && reviewers.length > 0) {
+            r.push(reviewers);
+          }
           return {
-            reviewers: acc.reviewers.concat(config.constrain.reviewers)
+            reviewerGroups: r
           };
         },
-        { reviewers: [] }
+        { reviewerGroups: [] }
       );
 
       return fn(

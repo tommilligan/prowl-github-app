@@ -6,7 +6,7 @@ const checkDelay = 1000;
 
 const merge_pr = async prowl => {
   const { robot, context, pr } = prowl;
-  robot.log.info(`merge: pr${pr.number}`);
+  robot.log.info(`${pr.url}: merge started`);
 
   const comment = context.repo({
     number: pr.number,
@@ -22,18 +22,14 @@ const merge_pr = async prowl => {
   });
   const result = await context.github.pullRequests.merge(merge);
   if (result && result.data && result.data.merged) {
-    robot.log.info(`merge: pr${pr.number} successfull`);
+    robot.log.info(`${pr.url}: merge successful`);
   } else {
-    robot.log.error(`merge: pr${pr.number} failed`);
+    robot.log.warning(`${pr.url}: merge failed`);
   }
 };
 
 const pr_status = async prowl => {
   const { robot, context, config, pr } = prowl;
-  robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
-
-  robot.log.info(`delaying check for ${checkDelay}ms`);
-  await utils.sleep(checkDelay);
 
   const conditions = [];
 
@@ -54,31 +50,53 @@ const pr_status = async prowl => {
   });
 
   // check commit is success
-  const params = context.repo({ ref: pr.head.sha });
-  const { data } = await context.github.repos.getCombinedStatusForRef(params);
+  const {
+    data: refStatus
+  } = await context.github.repos.getCombinedStatusForRef(
+    context.repo({ ref: pr.head.sha })
+  );
   conditions.push({
     description: "Commit status success",
-    value: data.state === "success"
+    value: refStatus.state === "success"
   });
 
-  robot.log.info(conditions);
+  // PR reviews
+  const { data: prReviews } = await context.github.pullRequests.getReviews(
+    context.repo({ number: pr.number, page: 100 })
+  );
+  const approvedReviewers = prReviews
+    .filter(review => {
+      const { commit_id, state } = review;
+      return commit_id === pr.head.sha && state === "APPROVED";
+    })
+    .map(review => review.user.login);
+  const approved = config.reviewerGroups.every(reviewerGroup => {
+    return reviewerGroup.some(reviewer => {
+      approvedReviewers.includes(reviewer);
+    });
+  });
+  conditions.push({
+    description: "Required reviewers approved",
+    value: approved
+  });
+
   return conditions;
 };
 
 const check_pr = async prowl => {
   const { robot, context, config, pr } = prowl;
-  robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
-
-  robot.log.info(`delaying check for ${checkDelay}ms`);
-  await utils.sleep(checkDelay);
 
   const conditions = await pr_status(prowl);
   const prReady = conditions.every(condition => condition.value);
-  robot.log.info(`pr: ready ${prReady}`);
+  robot.log.info(`${pr.url}: ready? ${prReady}`);
   return prReady;
 };
 
 const merge_pr_if_ready = async prowl => {
+  const { pr } = prowl;
+  robot.log.info(`${pr.url}: delaying check for ${checkDelay}ms`);
+  await utils.sleep(checkDelay);
+
   if (await check_pr(prowl)) {
     return merge_pr(prowl);
   }
@@ -89,60 +107,26 @@ const pr_comment = async prowl => {
   const { issue, comment } = context.payload;
   if (issue.pull_request) {
     // if this is a pull request
+    switch (subcommand) {
+      case "status": {
+        conditions = await pr_status(prowl);
 
-    robot.log.info(`comment: pr${issue.number} ${comment.body}`);
-
-    const args = comment.body.split(" ");
-    const command = args.shift();
-    const subcommand = args.shift();
-
-    // if this is a prowl trigger
-    if (command === "prowl" && subcommand) {
-      // get the current pr
-      const { data: pr } = await context.github.pullRequests.get(
-        context.issue()
-      );
-
-      switch (subcommand) {
-        case "approve": {
-          // post a response
-          if (comment.user.login === "tommilligan") {
-            const params = context.issue({
-              body: commentBodies.approvedBy(comment.user.login)
-            });
-            context.github.issues.createComment(params);
-
-            merge_pr_if_ready(prowl);
-          } else {
-            const params = context.issue({
-              body: commentBodies.unauthorized(comment.user.login)
-            });
-            context.github.issues.createComment(params);
-          }
-          break;
-        }
-        case "status": {
-          conditions = await pr_status(prowl);
-
-          const params = context.issue({
-            body: commentBodies.pr_status(conditions)
-          });
-          context.github.issues.createComment(params);
-          break;
-        }
-        case "config": {
-          const params = context.issue({
-            body: commentBodies.config(config)
-          });
-          context.github.issues.createComment(params);
-        }
-        default: {
-          break;
-        }
+        const params = context.issue({
+          body: commentBodies.pr_status(conditions)
+        });
+        context.github.issues.createComment(params);
+        break;
+      }
+      case "config": {
+        const params = context.issue({
+          body: commentBodies.config(config)
+        });
+        context.github.issues.createComment(params);
+      }
+      default: {
+        break;
       }
     }
-  } else {
-    robot.log.info("Comment was not on a PR");
   }
 };
 

@@ -7,9 +7,6 @@ const issue_comment = async prowl => {
   const { issue, comment } = context.payload;
   if (issue.pull_request) {
     // if this is a pull request comment (not an issue)
-
-    robot.log.info(`comment: pr${issue.number} ${comment.body}`);
-
     // look for a prowl command
     const args = comment.body.split(" ");
     const command = args.shift();
@@ -22,6 +19,7 @@ const issue_comment = async prowl => {
         context.issue()
       );
       // and forward for action
+      robot.log.info(`${pr.url}: command ${comment.body}`);
       withConfig(actions.pr_comment, {
         ...prowl,
         pr
@@ -30,12 +28,25 @@ const issue_comment = async prowl => {
   }
 };
 
+const pull_request_review = async prowl => {
+  const { robot, context } = prowl;
+  const { pull_request, review } = context.payload;
+
+  if (review.state === "approved" && pull_request.state === "open") {
+    const { data: pr } = await context.github.pullRequests.get(
+      context.repo({
+        number: pull_request.number
+      })
+    );
+    robot.info(`${pr.url}: ${review.user.login} ${review.state}`);
+    withConfig(actions.merge_pr_if_ready, { ...prowl, pr });
+  }
+};
+
 const status = async prowl => {
   const { robot, context } = prowl;
   const { state, sha, repository } = context.payload;
   const repo = repository.full_name;
-
-  robot.log.info(`status: ${repo} ${sha.slice(0, 7)} ${state}`);
 
   if (state === "success") {
     // if the status update was a success
@@ -49,22 +60,16 @@ const status = async prowl => {
 
     // for each PR
     prs.data.items.forEach(async item => {
-      const { data: pr } = await context.github.pullRequests.get({
-        owner: repository.owner.login,
-        repo: repository.name,
-        number: item.number
-      });
-
-      const freshness = s => {
-        robot.log.info(`Status on pr${pr.number} is ${s}`);
-      };
+      const { data: pr } = await context.github.pullRequests.get(
+        context.repo({
+          number: item.number
+        })
+      );
 
       // action if our commit is the HEAD
       if (sha === pr.head.sha) {
-        freshness("fresh");
+        robot.log.info(`${pr.url}: HEAD (${sha.slice(0, 7)}) status ${state}`);
         withConfig(actions.merge_pr_if_ready, { ...prowl, pr });
-      } else {
-        freshness("stale");
       }
     });
   }
@@ -72,5 +77,6 @@ const status = async prowl => {
 
 module.exports = {
   issue_comment,
+  pull_request_review,
   status
 };

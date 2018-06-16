@@ -2,12 +2,19 @@ const actions = require("./actions");
 const events = require("./events");
 
 module.exports = robot => {
-  robot.log("Yay, the app was loaded!");
+  robot.log.info("App started. Prowling...");
+
+  // log all events we hear
   robot.on(`*`, async context => {
-    robot.log(`Event: ${context.event}`);
+    robot.log(`event: ${context.event}`);
   });
-  robot.on(["issue_comment.created"], async context => {
+
+  // event specific listeners
+  robot.on("issue_comment.created", async context => {
     events.issue_comment({ robot, context });
+  });
+  robot.on("pull_request_review.submitted", async context => {
+    events.pull_request_review({ robot, context });
   });
   robot.on("status", async context => {
     events.status({ robot, context });
