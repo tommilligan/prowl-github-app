@@ -1,0 +1,11 @@
+version: '0.1.0'
+
+pull_requests:
+  - id: catchall
+    spec:
+      paths:
+        - "**/*"
+      base: master
+    constrain:
+      reviewers:
+        - jerry-the-benevolent-dictator

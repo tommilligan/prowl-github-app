@@ -1,0 +1,29 @@
+version: '0.1.0'
+
+pull_requests:
+  - id: frontend
+    spec:
+      paths:
+        - "**/*.{js,ts}"
+      base: master
+    constrain:
+      reviewers:
+        - tom-smith
+        - terry-burns
+  - id: backend
+    spec:
+      paths:
+        - "api/**/*"
+      base: master
+    constrain:
+      reviewers:
+        - neil-xu
+  - id: documentation
+    spec:
+      paths:
+        - "README.md"
+        - "LICENSE"
+      base: master
+    constrain:
+      reviewers: []
+
