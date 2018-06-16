@@ -1,28 +1,4 @@
-const utils = require("./utils");
-
-const checkDelay = 1000;
-
-const check_pr = async (robot, context, pr) => {
-  robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
-
-  robot.log.info(`delaying check for ${checkDelay}ms`);
-  await utils.sleep(checkDelay);
-
-  const params = context.repo({ ref: pr.head.sha });
-  const { data } = await context.github.repos.getCombinedStatusForRef(params);
-  robot.log.info(`head: pr${pr.number} ${data.state}`);
-
-  if (data.state === "success") {
-    robot.log.info("pr is ready to go");
-    const comment = context.repo({
-      number: pr.number,
-      body: "PR is ready for merge"
-    });
-    context.github.issues.createComment(comment);
-  } else {
-    robot.log.info("pr is not ready yet");
-  }
-};
+const actions = require("./actions");
 
 module.exports = robot => {
   robot.log("Yay, the app was loaded!");
@@ -49,7 +25,7 @@ module.exports = robot => {
           const { data: pr } = await context.github.pullRequests.get(
             context.issue()
           );
-          check_pr(robot, context, pr);
+          actions.check_pr(robot, context, pr);
         } else {
           const params = context.issue({
             body: `Apologies @${
@@ -89,7 +65,7 @@ module.exports = robot => {
         };
         if (sha === pr.head.sha) {
           freshness("fresh");
-          check_pr(robot, context, pr);
+          actions.check_pr(robot, context, pr);
         } else {
           freshness("stale");
         }
