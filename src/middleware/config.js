@@ -32,16 +32,32 @@ module.exports = async (fn, prowl, ...args) => {
       const dirtyFilePaths = dirtyFiles.map(f => f.filename);
 
       // filter configs
-      const pr_configs_matched = pr_configs.filter(pr_config => {
-        return utils.minimatchCartesian(dirtyFilePaths, pr_config.include, {
+      let pr_configs_matched = pr_configs;
+      // by base
+      pr_configs_matched = pr_configs_matched.filter(pr_config => {
+        return pr.base.ref === pr_config.spec.base;
+      });
+      // by filepaths
+      pr_configs_matched = pr_configs_matched.filter(pr_config => {
+        return utils.minimatchCartesian(dirtyFilePaths, pr_config.spec.paths, {
           dot: true
         });
       });
 
+      // summarise configs
+      const final_config = pr_configs_matched.reduce(
+        (acc, config) => {
+          return {
+            reviewers: acc.reviewers.concat(config.constrain.reviewers)
+          };
+        },
+        { reviewers: [] }
+      );
+
       return fn(
         {
           ...prowl,
-          config: pr_configs_matched
+          config: final_config
         },
         ...args
       );

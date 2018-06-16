@@ -72,7 +72,7 @@ const check_pr = async prowl => {
   robot.log.info(`delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
-  const conditions = pr_status(prowl);
+  const conditions = await pr_status(prowl);
   const prReady = conditions.every(condition => condition.value);
   robot.log.info(`pr: ready ${prReady}`);
   return prReady;
