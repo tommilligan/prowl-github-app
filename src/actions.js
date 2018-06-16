@@ -6,7 +6,7 @@ const checkDelay = 1000;
 
 const delete_pr = async prowl => {
   const { robot, context, pr } = prowl;
-  const { ref } = pr.head;
+  const ref = `heads/${pr.head.ref}`;
   robot.log.info(`${pr.url}: deleting ${ref}`);
   return await context.github.gitdata.deleteReference(context.repo({ ref }));
 };
@@ -24,6 +24,7 @@ const merge_pr = async prowl => {
   const result = await context.github.pullRequests.merge(merge);
   if (result && result.data && result.data.merged) {
     robot.log.info(`${pr.url}: merge successful`);
+    delete_pr(prowl);
   } else {
     robot.log.warn(`${pr.url}: merge failed`);
   }
@@ -74,13 +75,11 @@ const pr_status = async prowl => {
       return commit_id === pr.head.sha && state === "APPROVED";
     })
     .map(review => review.user.login);
-  robot.log.warn(approvedReviewers);
   const approved = config.reviewerGroups.every(reviewerGroup => {
     return reviewerGroup.some(reviewer => {
       return approvedReviewers.includes(reviewer);
     });
   });
-  robot.log.warn(approved);
   conditions.push({
     description: "Required reviewers approved",
     pass: approved,
@@ -95,18 +94,20 @@ const conditionsCheck = conditions => {
 };
 
 const merge_pr_if_ready = async prowl => {
-  const { robot, pr } = prowl;
+  const { robot, context, pr } = prowl;
   robot.log.info(`${pr.url}: delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
-  const conditions = pr_status(prowl);
+  const conditions = await pr_status(prowl);
+  const prReady = conditionsCheck(conditions);
+
   if (prReady) {
     robot.log.info(`${pr.url}: ready for merge`);
-    const comment = context.repo({
-      number: pr.number,
-      body: commentBodies.merge(conditions)
-    });
-    context.github.issues.createComment(comment);
+    // const comment = context.repo({
+    //   number: pr.number,
+    //   body: commentBodies.merge(conditions)
+    // });
+    // context.github.issues.createComment(comment);
     return merge_pr(prowl);
   }
 };
