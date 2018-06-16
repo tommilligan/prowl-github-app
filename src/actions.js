@@ -109,6 +109,8 @@ const merge_pr_if_ready = async prowl => {
     // });
     // context.github.issues.createComment(comment);
     return merge_pr(prowl);
+  } else {
+    robot.log.info(`${pr.url}: not ready for merge`);
   }
 };
 
