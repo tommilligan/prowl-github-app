@@ -1,15 +1,25 @@
+// Helpers
+const jsonBlock = o => `\`\`\`json
+${JSON.stringify(o, null, 2)}
+\`\`\``;
+
+// Comments
 const approvedBy = s => `Thanks ${s} - I'll merge when ready`;
 
-const pr_status = conditions => `Status of this PR:
-\`\`\`json
-${JSON.stringify(conditions, null, 2)}
-\`\`\`
+const config = c => `Prowl config for this PR:
+${jsonBlock(c)}
 `;
 
-const unauthorised = s =>
-  `Apologies @${s} - you are not authorized to approve this PR`;
+const pr_status = conditions => `Status of this PR:
+${jsonBlock(conditions)}
+`;
+
+const unauthorized = s =>
+  `Apologies @${s} - you are not authorized to action this PR`;
 
 module.exports = {
+  approvedBy,
+  config,
   pr_status,
-  unauthorised
+  unauthorized
 };

@@ -103,7 +103,7 @@ const comment_command = async prowl => {
       );
 
       switch (subcommand) {
-        case "approve":
+        case "approve": {
           // post a response
           if (comment.user.login === "tommilligan") {
             const params = context.issue({
@@ -114,12 +114,13 @@ const comment_command = async prowl => {
             merge_pr_if_ready(prowl, pr);
           } else {
             const params = context.issue({
-              body: commentBodies.unauthorised(comment.user.login)
+              body: commentBodies.unauthorized(comment.user.login)
             });
             context.github.issues.createComment(params);
           }
           break;
-        case "status":
+        }
+        case "status": {
           conditions = await pr_status(prowl, pr);
 
           const params = context.issue({
@@ -127,8 +128,16 @@ const comment_command = async prowl => {
           });
           context.github.issues.createComment(params);
           break;
-        default:
+        }
+        case "config": {
+          const params = context.issue({
+            body: commentBodies.config(config)
+          });
+          context.github.issues.createComment(params);
+        }
+        default: {
           break;
+        }
       }
     }
   } else {
