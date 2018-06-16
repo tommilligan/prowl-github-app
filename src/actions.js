@@ -1,5 +1,4 @@
 const utils = require("./utils");
-const yaml = require("js-yaml");
 
 const checkDelay = 1000;
 
@@ -55,28 +54,56 @@ const check_pr = async (robot, context, pr) => {
   robot.log.info("pr is not ready yet");
 };
 
-const get_config = async (robot, context) => {
-  robot.log.info("fetching config");
+const comment_command = async args => {
+  const { robot, context, config } = args;
+  const { issue, comment } = context.payload;
+  if (issue.pull_request) {
+    // if this is a pull request
 
-  // Only get prowl config from default branch
-  const fileref = context.repo({ path: ".prowl.yml" });
-  const result = await context.github.repos.getContent(fileref);
-  const { data: config_file } = result;
+    robot.log.info(`comment: pr${issue.number} ${comment.body}`);
 
-  robot.log.info(result);
-  if (config_file.type !== "file") {
-    throw new Error("No .prowl.yml found");
+    const args = comment.body.split(" ");
+    const command = args.shift();
+    const subcommand = args.shift();
+
+    // if this is a prowl trigger
+    if (command === "prowl" && subcommand) {
+      const config = await actions.get_config(robot, context);
+
+      switch (subcommand) {
+        case "approve":
+          // post a response
+          if (comment.user.login === "tommilligan") {
+            const params = context.issue({
+              body: `Thanks ${comment.user.login} - I'll merge when ready`
+            });
+            context.github.issues.createComment(params);
+
+            // get the current pr
+            const { data: pr } = await context.github.pullRequests.get(
+              context.issue()
+            );
+            actions.check_pr(robot, context, pr);
+          } else {
+            const params = context.issue({
+              body: `Apologies @${
+                comment.user.login
+              } - you are not authorized to approve this PR`
+            });
+            context.github.issues.createComment(params);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  } else {
+    robot.log.info("Comment was not on a PR");
   }
-
-  buf = Buffer.from(config_file.content, config_file.encoding);
-  const config = yaml.safeLoad(buf.toString("utf8"));
-  robot.log.info(config);
-
-  robot.log.info("reading config");
-  return config;
 };
 
 module.exports = {
   check_pr,
-  get_config
+  comment_command,
+  merge_pr
 };
