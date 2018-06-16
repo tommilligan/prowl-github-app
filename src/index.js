@@ -1,16 +1,12 @@
-const checkDelay = 1000;
+const utils = require("./utils");
 
-function sleep(ms) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-}
+const checkDelay = 1000;
 
 const check_pr = async (robot, context, pr) => {
   robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
 
   robot.log.info(`delaying check for ${checkDelay}ms`);
-  await sleep(checkDelay);
+  await utils.sleep(checkDelay);
 
   const params = context.repo({ ref: pr.head.sha });
   const { data } = await context.github.repos.getCombinedStatusForRef(params);
@@ -34,24 +30,34 @@ module.exports = robot => {
     robot.log(`Event: ${context.event}`);
   });
   robot.on(["issue_comment.created"], async context => {
-    const { payload } = context;
-    if (payload.issue.pull_request) {
+    const { issue, comment } = context.payload;
+    if (issue.pull_request) {
       // if this is a pull request
-      const { body } = payload.comment;
 
-      robot.log.info(`comment: pr${payload.issue.number} ${body}`);
+      robot.log.info(`comment: pr${issue.number} ${comment.body}`);
 
       // if this is a prowl trigger
-      if (body === "prowl") {
+      if (comment.body === "prowl approve") {
         // post a response
-        const params = context.issue({ body: "Thanks - I'm on it." });
-        context.github.issues.createComment(params);
+        if (comment.user.login === "tommilligan") {
+          const params = context.issue({
+            body: `Thanks ${comment.user.login} - I'll merge when ready`
+          });
+          context.github.issues.createComment(params);
 
-        // get the current pr
-        const { data: pr } = await context.github.pullRequests.get(
-          context.issue()
-        );
-        check_pr(robot, context, pr);
+          // get the current pr
+          const { data: pr } = await context.github.pullRequests.get(
+            context.issue()
+          );
+          check_pr(robot, context, pr);
+        } else {
+          const params = context.issue({
+            body: `Apologies @${
+              comment.user.login
+            } - you are not authorized to approve this PR`
+          });
+          context.github.issues.createComment(params);
+        }
       }
     } else {
       robot.log.info("Comment was not on a PR");
