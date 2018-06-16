@@ -3,7 +3,8 @@ const utils = require("./utils");
 const checkDelay = 1000;
 
 const merge_pr = async (robot, context, pr) => {
-  robot.log.info("pr is ready to go");
+  robot.log.info(`merge: pr${pr.number}`);
+
   const comment = context.repo({
     number: pr.number,
     body: "PR is ready for merge"
@@ -16,7 +17,12 @@ const merge_pr = async (robot, context, pr) => {
     sha: pr.head.sha,
     merge_method: "squash"
   });
-  const result = await octokit.pullRequests.merge(merge);
+  const result = await context.github.pullRequests.merge(merge);
+  if (result && result.data && result.data.merged) {
+    robot.log.info(`merge: pr${pr.number} successfull`);
+  } else {
+    robot.log.error(`merge: pr${pr.number} failed`);
+  }
 };
 
 const check_pr = async (robot, context, pr) => {
@@ -26,7 +32,7 @@ const check_pr = async (robot, context, pr) => {
   await utils.sleep(checkDelay);
 
   // check HEAD hasn't moved
-  const { pr_check } = await context.github.pullRequests.get(
+  const { data: pr_check } = await context.github.pullRequests.get(
     context.repo({ number: pr.number })
   );
   if (pr_check.head.sha === pr.head.sha) {
@@ -39,7 +45,9 @@ const check_pr = async (robot, context, pr) => {
     if (data.state === "success") {
       robot.log.info(`head is ${data.state}`);
 
-      merge_pr(robot, context, pr_check);
+      if (false) {
+        return merge_pr(robot, context, pr_check);
+      }
     }
   }
 
