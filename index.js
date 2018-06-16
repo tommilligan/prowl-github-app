@@ -1,10 +1,67 @@
-module.exports = app => {
-  // Your code here
-  app.log('Yay, the app was loaded!')
+const check_pr = async (robot, context, pr) => {
+  robot.log.info(`head: pr${pr.number} ${pr.head.sha}`);
+};
 
-  // For more information on building apps:
-  // https://probot.github.io/docs/
+module.exports = robot => {
+  robot.log("Yay, the app was loaded!");
+  robot.on(`*`, async context => {
+    robot.log(`Event: ${context.event}`);
+  });
+  robot.on(["issue_comment.created"], async context => {
+    const { payload } = context;
+    if (payload.issue.pull_request) {
+      // if this is a pull request
+      const { body } = payload.comment;
 
-  // To get your app running against GitHub, see:
-  // https://probot.github.io/docs/development/
-}
+      robot.log.info(`comment: pr${payload.issue.number} ${body}`);
+
+      // if this is a prowl trigger
+      if (body === "prowl") {
+        // post a response
+        const params = context.issue({ body: "Thanks - I'm on it." });
+        context.github.issues.createComment(params);
+
+        // get the current pr
+        const { data } = await context.github.pullRequests.get(context.issue());
+        check_pr(robot, context, data);
+      }
+    } else {
+      robot.log.info("Comment was not on a PR");
+    }
+  });
+  robot.on("status", async context => {
+    const { state, sha, repository } = context.payload;
+    const repo = repository.full_name;
+
+    robot.log.info(`status: ${repo} ${sha.slice(0, 7)} ${state}`);
+
+    if (state === "success") {
+      q = `${sha} repo:${repo} type:pr`;
+      const prs = await context.github.search.issues({
+        q: sha,
+        sort: "updated",
+        order: "desc"
+      });
+
+      prs.data.items.forEach(async item => {
+        const { data: pr } = await context.github.pullRequests.get({
+          owner: repository.owner.login,
+          repo: repository.name,
+          number: item.number
+        });
+
+        const freshness = s => {
+          robot.log.info(`Status on pr${pr.number} is ${s}`);
+        };
+        if (sha === pr.head.sha) {
+          freshness("fresh");
+          check_pr(robot, context, pr);
+        } else {
+          freshness("stale");
+        }
+      });
+    } else {
+      robot.log.info("Status was not success");
+    }
+  });
+};
