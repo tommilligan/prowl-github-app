@@ -1,4 +1,5 @@
 const utils = require("./utils");
+const yaml = require("js-yaml");
 
 const checkDelay = 1000;
 
@@ -56,8 +57,23 @@ const check_pr = async (robot, context, pr) => {
 
 const get_config = async (robot, context) => {
   robot.log.info("fetching config");
+
+  // Only get prowl config from default branch
+  const fileref = context.repo({ path: ".prowl.yml" });
+  const result = await context.github.repos.getContent(fileref);
+  const { data: config_file } = result;
+
+  robot.log.info(result);
+  if (config_file.type !== "file") {
+    throw new Error("No .prowl.yml found");
+  }
+
+  buf = Buffer.from(config_file.content, config_file.encoding);
+  const config = yaml.safeLoad(buf.toString("utf8"));
+  robot.log.info(config);
+
   robot.log.info("reading config");
-  return {};
+  return config;
 };
 
 module.exports = {

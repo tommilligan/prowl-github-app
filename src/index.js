@@ -12,27 +12,39 @@ module.exports = robot => {
 
       robot.log.info(`comment: pr${issue.number} ${comment.body}`);
 
-      // if this is a prowl trigger
-      if (comment.body === "prowl approve") {
-        // post a response
-        if (comment.user.login === "tommilligan") {
-          const params = context.issue({
-            body: `Thanks ${comment.user.login} - I'll merge when ready`
-          });
-          context.github.issues.createComment(params);
+      const args = comment.body.split(" ");
+      const command = args.shift();
+      const subcommand = args.shift();
 
-          // get the current pr
-          const { data: pr } = await context.github.pullRequests.get(
-            context.issue()
-          );
-          actions.check_pr(robot, context, pr);
-        } else {
-          const params = context.issue({
-            body: `Apologies @${
-              comment.user.login
-            } - you are not authorized to approve this PR`
-          });
-          context.github.issues.createComment(params);
+      // if this is a prowl trigger
+      if (command === "prowl" && subcommand) {
+        const config = await actions.get_config(robot, context);
+
+        switch (subcommand) {
+          case "approve":
+            // post a response
+            if (comment.user.login === "tommilligan") {
+              const params = context.issue({
+                body: `Thanks ${comment.user.login} - I'll merge when ready`
+              });
+              context.github.issues.createComment(params);
+
+              // get the current pr
+              const { data: pr } = await context.github.pullRequests.get(
+                context.issue()
+              );
+              actions.check_pr(robot, context, pr);
+            } else {
+              const params = context.issue({
+                body: `Apologies @${
+                  comment.user.login
+                } - you are not authorized to approve this PR`
+              });
+              context.github.issues.createComment(params);
+            }
+            break;
+          default:
+            break;
         }
       }
     } else {
