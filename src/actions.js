@@ -24,7 +24,7 @@ const merge_pr = async prowl => {
   if (result && result.data && result.data.merged) {
     robot.log.info(`${pr.url}: merge successful`);
   } else {
-    robot.log.warning(`${pr.url}: merge failed`);
+    robot.log.warn(`${pr.url}: merge failed`);
   }
 };
 
@@ -62,17 +62,19 @@ const pr_status = async prowl => {
 
   // PR reviews
   const { data: prReviews } = await context.github.pullRequests.getReviews(
-    context.repo({ number: pr.number, page: 100 })
+    context.repo({ number: pr.number, per_page: 100 })
   );
+  robot.log.warn(prReviews);
   const approvedReviewers = prReviews
     .filter(review => {
       const { commit_id, state } = review;
       return commit_id === pr.head.sha && state === "APPROVED";
     })
     .map(review => review.user.login);
+  robot.log.warn(approvedReviewers);
   const approved = config.reviewerGroups.every(reviewerGroup => {
     return reviewerGroup.some(reviewer => {
-      approvedReviewers.includes(reviewer);
+      return approvedReviewers.includes(reviewer);
     });
   });
   conditions.push({
@@ -93,7 +95,7 @@ const check_pr = async prowl => {
 };
 
 const merge_pr_if_ready = async prowl => {
-  const { pr } = prowl;
+  const { robot, pr } = prowl;
   robot.log.info(`${pr.url}: delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
@@ -102,37 +104,34 @@ const merge_pr_if_ready = async prowl => {
   }
 };
 
-const pr_comment = async prowl => {
+const prowl_command = async (prowl, command) => {
   const { robot, context, config, pr } = prowl;
   const { issue, comment } = context.payload;
-  if (issue.pull_request) {
-    // if this is a pull request
-    switch (subcommand) {
-      case "status": {
-        conditions = await pr_status(prowl);
+  switch (command) {
+    case "status": {
+      conditions = await pr_status(prowl);
 
-        const params = context.issue({
-          body: commentBodies.pr_status(conditions)
-        });
-        context.github.issues.createComment(params);
-        break;
-      }
-      case "config": {
-        const params = context.issue({
-          body: commentBodies.config(config)
-        });
-        context.github.issues.createComment(params);
-      }
-      default: {
-        break;
-      }
+      const params = context.issue({
+        body: commentBodies.pr_status(conditions)
+      });
+      context.github.issues.createComment(params);
+      break;
+    }
+    case "config": {
+      const params = context.issue({
+        body: commentBodies.config(config)
+      });
+      context.github.issues.createComment(params);
+    }
+    default: {
+      break;
     }
   }
 };
 
 module.exports = {
   check_pr,
-  pr_comment,
+  prowl_command,
   merge_pr,
   merge_pr_if_ready,
   pr_status

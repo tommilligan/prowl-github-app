@@ -20,10 +20,14 @@ const issue_comment = async prowl => {
       );
       // and forward for action
       robot.log.info(`${pr.url}: command ${comment.body}`);
-      withConfig(actions.pr_comment, {
-        ...prowl,
-        pr
-      });
+      withConfig(
+        actions.prowl_command,
+        {
+          ...prowl,
+          pr
+        },
+        subcommand
+      );
     }
   }
 };
@@ -38,7 +42,7 @@ const pull_request_review = async prowl => {
         number: pull_request.number
       })
     );
-    robot.info(`${pr.url}: ${review.user.login} ${review.state}`);
+    robot.log.info(`${pr.url}: ${review.user.login} ${review.state}`);
     withConfig(actions.merge_pr_if_ready, { ...prowl, pr });
   }
 };

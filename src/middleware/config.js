@@ -17,7 +17,7 @@ module.exports = async (fn, prowl, ...args) => {
   const { data: config_file } = result;
 
   if (config_file.type !== "file") {
-    robot.log.warning(`${pr.url}: No .prowl.yml found`);
+    robot.log.warn(`${pr.url}: No .prowl.yml found`);
   } else {
     try {
       robot.log.debug("reading config");
