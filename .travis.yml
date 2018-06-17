@@ -13,10 +13,9 @@ script:
 after_success:
   - |
     if [[ $TRAVIS_BRANCH == "master" ]]; then
-      docker build -t prowl-github-app . &&
-      docker tag prowl-github-app registry.heroku.com/prowl-github-app/web &&
-      docker login -u "$HEROKU_USER" -p "$HEROKU_API_KEY" registry.heroku.com &&
-      docker push registry.heroku.com/prowl-github-app/web ||
+      heroku container:login &&
+      heroku container:push -a prowl-github-app web &&
+      heroku container:release -a prowl-github-app web ||
       exit 1
     fi
 notifications:
