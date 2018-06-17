@@ -136,6 +136,7 @@ const prowl_command = async (prowl, command) => {
           body: commentBodies.config(config)
         })
       );
+      break;
     }
     case "id": {
       context.github.issues.createComment(
@@ -143,6 +144,7 @@ const prowl_command = async (prowl, command) => {
           body: commentBodies.id(process.env.APP_ID)
         })
       );
+      break;
     }
     default: {
       break;
