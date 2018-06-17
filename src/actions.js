@@ -1,3 +1,5 @@
+require("dotenv-safe").config();
+
 const commentBodies = require("./commentBodies");
 const utils = require("./utils");
 const withConfig = require("./middleware/config");
@@ -121,17 +123,26 @@ const prowl_command = async (prowl, command) => {
     case "status": {
       conditions = await pr_status(prowl);
 
-      const params = context.issue({
-        body: commentBodies.pr_status(conditions)
-      });
-      context.github.issues.createComment(params);
+      context.github.issues.createComment(
+        context.issue({
+          body: commentBodies.pr_status(conditions)
+        })
+      );
       break;
     }
     case "config": {
-      const params = context.issue({
-        body: commentBodies.config(config)
-      });
-      context.github.issues.createComment(params);
+      context.github.issues.createComment(
+        context.issue({
+          body: commentBodies.config(config)
+        })
+      );
+    }
+    case "id": {
+      context.github.issues.createComment(
+        context.issue({
+          body: commentBodies.id(process.env.APP_ID)
+        })
+      );
     }
     default: {
       break;

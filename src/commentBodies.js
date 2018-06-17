@@ -18,6 +18,8 @@ const merge = conditions => `PR ready for merge:
 ${jsonBlock(conditions)}
 `;
 
+const id = s => `prowl app id: \`${s}\``;
+
 const unauthorized = s =>
   `Apologies @${s} - you are not authorized to action this PR`;
 
@@ -26,5 +28,6 @@ module.exports = {
   config,
   pr_status,
   merge,
-  unauthorized
+  unauthorized,
+  id
 };
