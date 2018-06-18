@@ -72,7 +72,6 @@ module.exports = async (fn, prowl, ...args) => {
       buf = Buffer.from(config_file.content, config_file.encoding);
       const config = yaml.safeLoad(buf.toString("utf8"));
       const prConfig = await calculatePRConfig(prowl, config);
-      context.log.warn(prConfig);
 
       return fn(
         {

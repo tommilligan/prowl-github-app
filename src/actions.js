@@ -8,6 +8,8 @@
  * If config.dryRun is true, other actions will be
  * replaced with comments.
  */
+const url = require("url");
+
 const commentBodies = require("./commentBodies");
 
 // Dry actions
@@ -28,13 +30,15 @@ async function prComment(prowl, body) {
  * If we're not in dryRun, call action. Otherwise, comment message.
  */
 async function wetRun(prowl, action, message) {
+  const { context, pr } = prowl;
   if (!prowl.config.dryRun) {
     context.log.info(`${pr.url}: ${message}`);
     return action();
   } else {
     const payload = {
-      pr: pr.url,
-      time: Date.now().toISOString(),
+      configUrl: url.resolve(pr.base.repo.html_url, "/blob/master/.prowl.yml"),
+      prUrl: pr.url,
+      time: new Date().toISOString(),
       message
     };
     prComment(prowl, commentBodies.dryRun(payload));
@@ -46,13 +50,17 @@ async function wetRun(prowl, action, message) {
 
 async function prDelete(prowl) {
   const { context, pr, config } = prowl;
-  const ref = `heads/${pr.head.ref}`;
+  const { ref } = pr.head;
 
-  const message = `deleting ${ref}`;
+  const qualifiedRef = `heads/${ref}`;
+  const message = `deleted ref ${ref}`;
+
   return wetRun(
     prowl,
     async function() {
-      return context.github.gitdata.deleteReference(context.repo({ ref }));
+      return context.github.gitdata.deleteReference(
+        context.repo({ ref: qualifiedRef })
+      );
     },
     message
   );
@@ -61,7 +69,7 @@ async function prDelete(prowl) {
 async function prMerge(prowl) {
   const { context, pr } = prowl;
 
-  const message = `merging pr ${pr.number}`;
+  const message = `merged PR ${pr.number}`;
   const merge = context.repo({
     number: pr.number,
     commit_title: `${pr.title} (#${pr.number})`,

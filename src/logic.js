@@ -101,15 +101,15 @@ const prowlCommand = async (prowl, command) => {
   switch (command) {
     case "status": {
       conditions = await prPounceStatus(prowl);
-      actions.prComment(commentBodies.pounceStatus(conditions));
+      actions.prComment(prowl, commentBodies.pounceStatus(conditions));
       break;
     }
     case "config": {
-      actions.prComment(commentBodies.config(config));
+      actions.prComment(prowl, commentBodies.config(config));
       break;
     }
     case "id": {
-      actions.prComment(commentBodies.id(process.env.APP_ID));
+      actions.prComment(prowl, commentBodies.id(process.env.APP_ID));
       break;
     }
     default: {
