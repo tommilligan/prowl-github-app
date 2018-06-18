@@ -1,6 +1,6 @@
 const withConfig = require("./middleware/config");
 
-const actions = require("./actions");
+const logic = require("./logic");
 
 const issue_comment = async prowl => {
   const { robot, context } = prowl;
@@ -21,7 +21,7 @@ const issue_comment = async prowl => {
       // and forward for action
       robot.log.info(`${pr.url}: command ${comment.body}`);
       withConfig(
-        actions.prowl_command,
+        logic.prowl_command,
         {
           ...prowl,
           pr
@@ -43,7 +43,7 @@ const pull_request_review = async prowl => {
       })
     );
     robot.log.info(`${pr.url}: ${review.user.login} ${review.state}`);
-    withConfig(actions.merge_pr_if_ready, { ...prowl, pr });
+    withConfig(logic.merge_pr_if_ready, { ...prowl, pr });
   }
 };
 
@@ -73,7 +73,7 @@ const status = async prowl => {
       // action if our commit is the HEAD
       if (sha === pr.head.sha) {
         robot.log.info(`${pr.url}: HEAD (${sha.slice(0, 7)}) status ${state}`);
-        withConfig(actions.merge_pr_if_ready, { ...prowl, pr });
+        withConfig(logic.merge_pr_if_ready, { ...prowl, pr });
       }
     });
   }

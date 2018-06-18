@@ -1,4 +1,3 @@
-const actions = require("./actions");
 const events = require("./events");
 
 module.exports = robot => {
