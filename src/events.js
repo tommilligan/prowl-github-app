@@ -10,7 +10,6 @@
  */
 
 const withConfig = require("./middleware/config");
-
 const logic = require("./logic");
 
 const issue_comment = async prowl => {

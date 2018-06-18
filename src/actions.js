@@ -80,16 +80,17 @@ async function prMerge(prowl) {
   const result = await wetRun(
     prowl,
     async function() {
-      context.github.pullRequests.merge(merge);
+      return context.github.pullRequests.merge(merge);
     },
     message
   );
 
   if (result && result.data && result.data.merged) {
     context.log.info(`${pr.url}: merge successful`);
-    await delete_pr(prowl);
+    await prDelete(prowl);
   } else {
     context.log.warn(`${pr.url}: merge failed`);
+    context.log.warn(result);
   }
 }
 

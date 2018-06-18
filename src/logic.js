@@ -90,7 +90,7 @@ const prMergeTry = async prowl => {
     //   body: commentBodies.merge(conditions)
     // });
     // context.github.issues.createComment(comment);
-    return merge_pr(prowl);
+    return actions.prMerge(prowl);
   } else {
     context.log.info(`${pr.url}: not ready for merge`);
   }
