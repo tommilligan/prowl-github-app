@@ -1,29 +1,29 @@
 version: '0.1.0'
 
-pull_requests:
+targets:
   - id: frontend
-    spec:
+    stalk:
       paths:
         - "**/*.{js,ts}"
       base: master
-    constrain:
+    pounce:
       reviewers:
         - tom-smith
         - terry-burns
   - id: backend
-    spec:
+    stalk:
       paths:
         - "api/**/*"
       base: master
-    constrain:
+    pounce:
       reviewers:
         - neil-xu
   - id: documentation
-    spec:
+    stalk:
       paths:
         - "README.md"
         - "LICENSE"
       base: master
-    constrain:
+    pounce:
       reviewers: []
 

@@ -2,8 +2,19 @@ const yaml = require("js-yaml");
 
 const utils = require("./utils");
 
+function summariseTargets(targets) {
+  return {
+    dryRun: targets.some(target => target.dry_run),
+    reviewerGroups: targets
+      .map(target => target.pounce.reviewers)
+      .filter(reviewers => {
+        return reviewers && reviewers.length > 1;
+      })
+  };
+}
+
 /**
- * Given the existing
+ * Given the existing pr and raw config, calculate which targets match
  * @param {*} prowl
  */
 async function calculatePRConfig(prowl, config) {
@@ -15,28 +26,27 @@ async function calculatePRConfig(prowl, config) {
   );
   const dirtyFilePaths = dirtyFiles.map(f => f.filename);
 
-  // Filter rules from the config
-  rulesMatched = config.rules
+  // Filter targets from the config
+  const targetsMatched = config.targets
     // by base
-    .filter(pr_config => {
-      return pr.base.ref === pr_config.spec.base;
+    .filter(target => {
+      return pr.base.ref === target.stalk.base;
     })
     // by filepath
-    .filter(pr_config => {
-      return utils.minimatchCartesian(dirtyFilePaths, pr_config.spec.paths, {
+    .filter(target => {
+      return utils.minimatchCartesian(dirtyFilePaths, target.stalk.paths, {
         dot: true
       });
     });
+  context.log.info(
+    `${pr.url}: matches targets ${JSON.stringify(
+      targetsMatched.map(t => t.id)
+    )}`
+  );
 
-  // Summarise rules succintly
-  const final_config = {
-    dryRun: rulesMatched.some(pr_config => pr_config.dryRun),
-    reviewerGroups: rulesMatched
-      .map(r => r.constrain.reviewers)
-      .filter(reviewers => {
-        return reviewers && reviewers.length > 1;
-      })
-  };
+  // Summarise targets succintly
+  const prConfig = summariseTargets(targetsMatched);
+  return prConfig;
 }
 
 /**
@@ -61,7 +71,8 @@ module.exports = async (fn, prowl, ...args) => {
 
       buf = Buffer.from(config_file.content, config_file.encoding);
       const config = yaml.safeLoad(buf.toString("utf8"));
-      const prConfig = calculatePRConfig(prowl, config);
+      const prConfig = await calculatePRConfig(prowl, config);
+      context.log.warn(prConfig);
 
       return fn(
         {
