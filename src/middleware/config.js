@@ -3,6 +3,43 @@ const yaml = require("js-yaml");
 const utils = require("./utils");
 
 /**
+ * Given the existing
+ * @param {*} prowl
+ */
+async function calculatePRConfig(prowl, config) {
+  const { robot, context, pr } = prowl;
+
+  // Get files changed in this pr
+  const { data: dirtyFiles } = await context.github.pullRequests.getFiles(
+    context.repo({ number: pr.number, per_page: 100 })
+  );
+  const dirtyFilePaths = dirtyFiles.map(f => f.filename);
+
+  // Filter rules from the config
+  rulesMatched = config.rules
+    // by base
+    .filter(pr_config => {
+      return pr.base.ref === pr_config.spec.base;
+    })
+    // by filepath
+    .filter(pr_config => {
+      return utils.minimatchCartesian(dirtyFilePaths, pr_config.spec.paths, {
+        dot: true
+      });
+    });
+
+  // Summarise rules succintly
+  const final_config = {
+    dryRun: rulesMatched.some(pr_config => pr_config.dryRun),
+    reviewerGroups: rulesMatched
+      .map(r => r.constrain.reviewers)
+      .filter(reviewers => {
+        return reviewers && reviewers.length > 1;
+      })
+  };
+}
+
+/**
  * Run the specified function with the given {...prowl, config}
  * @param {function} fn Function to call on event
  * @param {object} args Additional params for fn
@@ -24,45 +61,12 @@ module.exports = async (fn, prowl, ...args) => {
 
       buf = Buffer.from(config_file.content, config_file.encoding);
       const config = yaml.safeLoad(buf.toString("utf8"));
-      const pr_configs = config.pull_requests;
-
-      const { data: dirtyFiles } = await context.github.pullRequests.getFiles(
-        context.repo({ number: pr.number, per_page: 100 })
-      );
-      const dirtyFilePaths = dirtyFiles.map(f => f.filename);
-
-      // filter configs
-      let pr_configs_matched = pr_configs;
-      // by base
-      pr_configs_matched = pr_configs_matched.filter(pr_config => {
-        return pr.base.ref === pr_config.spec.base;
-      });
-      // by filepaths
-      pr_configs_matched = pr_configs_matched.filter(pr_config => {
-        return utils.minimatchCartesian(dirtyFilePaths, pr_config.spec.paths, {
-          dot: true
-        });
-      });
-
-      // summarise configs
-      const final_config = pr_configs_matched.reduce(
-        (acc, config) => {
-          const r = acc.reviewerGroups.slice();
-          const { reviewers } = config.constrain;
-          if (reviewers && reviewers.length > 0) {
-            r.push(reviewers);
-          }
-          return {
-            reviewerGroups: r
-          };
-        },
-        { reviewerGroups: [] }
-      );
+      const prConfig = calculatePRConfig(prowl, config);
 
       return fn(
         {
           ...prowl,
-          config: final_config
+          config: prConfig
         },
         ...args
       );
