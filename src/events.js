@@ -1,3 +1,14 @@
+/**
+ * Events are triggered by an incoming prowl object, {robot, context}
+ * They are responsible for:
+ *   - deciding if the incoming event is relevant
+ *   - identifying a linked PR (if any)
+ *   - forwarding prowl context such that {...prowl, pr},
+ *     where pr has been retrieved from the GitHub API
+ *   - applying withConfig middleware
+ *   - forwarding to a logical handler
+ */
+
 const withConfig = require("./middleware/config");
 
 const logic = require("./logic");
@@ -19,9 +30,9 @@ const issue_comment = async prowl => {
         context.issue()
       );
       // and forward for action
-      robot.log.info(`${pr.url}: command ${comment.body}`);
+      context.log.info(`${pr.url}: command ${comment.body}`);
       withConfig(
-        logic.prowl_command,
+        logic.prowlCommand,
         {
           ...prowl,
           pr
@@ -42,8 +53,8 @@ const pull_request_review = async prowl => {
         number: pull_request.number
       })
     );
-    robot.log.info(`${pr.url}: ${review.user.login} ${review.state}`);
-    withConfig(logic.merge_pr_if_ready, { ...prowl, pr });
+    context.log.info(`${pr.url}: ${review.user.login} ${review.state}`);
+    withConfig(logic.prMergeTry, { ...prowl, pr });
   }
 };
 
@@ -72,8 +83,10 @@ const status = async prowl => {
 
       // action if our commit is the HEAD
       if (sha === pr.head.sha) {
-        robot.log.info(`${pr.url}: HEAD (${sha.slice(0, 7)}) status ${state}`);
-        withConfig(logic.merge_pr_if_ready, { ...prowl, pr });
+        context.log.info(
+          `${pr.url}: HEAD (${sha.slice(0, 7)}) status ${state}`
+        );
+        withConfig(logic.prMergeTry, { ...prowl, pr });
       }
     });
   }

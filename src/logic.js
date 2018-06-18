@@ -1,38 +1,18 @@
+/**
+ * Logic handlers recieve a full context with PR and configuration.
+ * They are responsible for detemining which actions to perform.
+ */
+
 require("dotenv-safe").config();
 
+const actions = require("./actions");
 const commentBodies = require("./commentBodies");
 const utils = require("./utils");
 const withConfig = require("./middleware/config");
 
 const checkDelay = 1000;
 
-const delete_pr = async prowl => {
-  const { robot, context, pr } = prowl;
-  const ref = `heads/${pr.head.ref}`;
-  robot.log.info(`${pr.url}: deleting ${ref}`);
-  return await context.github.gitdata.deleteReference(context.repo({ ref }));
-};
-
-const merge_pr = async prowl => {
-  const { robot, context, pr } = prowl;
-  robot.log.info(`${pr.url}: merge started`);
-
-  const merge = context.repo({
-    number: pr.number,
-    commit_title: `${pr.title} (#${pr.number})`,
-    sha: pr.head.sha,
-    merge_method: "squash"
-  });
-  const result = await context.github.pullRequests.merge(merge);
-  if (result && result.data && result.data.merged) {
-    robot.log.info(`${pr.url}: merge successful`);
-    delete_pr(prowl);
-  } else {
-    robot.log.warn(`${pr.url}: merge failed`);
-  }
-};
-
-const pr_status = async prowl => {
+const prPounceStatus = async prowl => {
   const { robot, context, config, pr } = prowl;
 
   const conditions = [];
@@ -95,16 +75,16 @@ const conditionsCheck = conditions => {
   return conditions.every(condition => condition.pass);
 };
 
-const merge_pr_if_ready = async prowl => {
+const prMergeTry = async prowl => {
   const { robot, context, pr } = prowl;
-  robot.log.info(`${pr.url}: delaying check for ${checkDelay}ms`);
+  context.log.info(`${pr.url}: delaying check for ${checkDelay}ms`);
   await utils.sleep(checkDelay);
 
-  const conditions = await pr_status(prowl);
+  const conditions = await prPounceStatus(prowl);
   const prReady = conditionsCheck(conditions);
 
   if (prReady) {
-    robot.log.info(`${pr.url}: ready for merge`);
+    context.log.info(`${pr.url}: ready for merge`);
     // const comment = context.repo({
     //   number: pr.number,
     //   body: commentBodies.merge(conditions)
@@ -112,38 +92,24 @@ const merge_pr_if_ready = async prowl => {
     // context.github.issues.createComment(comment);
     return merge_pr(prowl);
   } else {
-    robot.log.info(`${pr.url}: not ready for merge`);
+    context.log.info(`${pr.url}: not ready for merge`);
   }
 };
 
-const prowl_command = async (prowl, command) => {
-  const { robot, context, config, pr } = prowl;
-  const { issue, comment } = context.payload;
+const prowlCommand = async (prowl, command) => {
+  const { config } = prowl;
   switch (command) {
     case "status": {
-      conditions = await pr_status(prowl);
-
-      context.github.issues.createComment(
-        context.issue({
-          body: commentBodies.pr_status(conditions)
-        })
-      );
+      conditions = await prPounceStatus(prowl);
+      actions.prComment(commentBodies.pounceStatus(conditions));
       break;
     }
     case "config": {
-      context.github.issues.createComment(
-        context.issue({
-          body: commentBodies.config(config)
-        })
-      );
+      actions.prComment(commentBodies.config(config));
       break;
     }
     case "id": {
-      context.github.issues.createComment(
-        context.issue({
-          body: commentBodies.id(process.env.APP_ID)
-        })
-      );
+      actions.prComment(commentBodies.id(process.env.APP_ID));
       break;
     }
     default: {
@@ -153,8 +119,6 @@ const prowl_command = async (prowl, command) => {
 };
 
 module.exports = {
-  prowl_command,
-  merge_pr,
-  merge_pr_if_ready,
-  pr_status
+  prowlCommand,
+  prMergeTry
 };

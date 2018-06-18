@@ -56,7 +56,7 @@ async function calculatePRConfig(prowl, config) {
  */
 module.exports = async (fn, prowl, ...args) => {
   const { robot, context, pr } = prowl;
-  robot.log.debug("fetching config");
+  context.log.debug("fetching config");
 
   // Only get prowl config from default branch
   const fileref = context.repo({ path: ".prowl.yml" });
@@ -64,10 +64,10 @@ module.exports = async (fn, prowl, ...args) => {
   const { data: config_file } = result;
 
   if (config_file.type !== "file") {
-    robot.log.warn(`${pr.url}: No .prowl.yml found`);
+    context.log.warn(`${pr.url}: No .prowl.yml found`);
   } else {
     try {
-      robot.log.debug("reading config");
+      context.log.debug("reading config");
 
       buf = Buffer.from(config_file.content, config_file.encoding);
       const config = yaml.safeLoad(buf.toString("utf8"));
@@ -82,8 +82,8 @@ module.exports = async (fn, prowl, ...args) => {
         ...args
       );
     } catch (e) {
-      robot.log.error("Error loading prowl config");
-      robot.log.error(e);
+      context.log.error("Error loading prowl config");
+      context.log.error(e);
     }
   }
 };

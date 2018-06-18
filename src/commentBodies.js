@@ -3,31 +3,18 @@ const jsonBlock = o => `\`\`\`json
 ${JSON.stringify(o, null, 2)}
 \`\`\``;
 
+const commentWithJSON = (s, o) => `${s}
+${jsonBlock(o)}`;
+
 // Comments
-const approvedBy = s => `Thanks ${s} - I'll merge when ready`;
-
-const config = c => `Prowl config for this PR:
-${jsonBlock(c)}
-`;
-
-const pr_status = conditions => `Status of this PR:
-${jsonBlock(conditions)}
-`;
-
-const merge = conditions => `PR ready for merge:
-${jsonBlock(conditions)}
-`;
-
+const config = o => commentWithJSON(`Prowl config for this PR`, o);
+const dryRun = o => (`prowl is treating this PR as a dry run`, o);
 const id = s => `prowl app id: \`${s}\``;
-
-const unauthorized = s =>
-  `Apologies @${s} - you are not authorized to action this PR`;
+const pounceStatus = o => commentWithJSON(`Status of this PR`, o);
 
 module.exports = {
-  approvedBy,
   config,
-  pr_status,
-  merge,
-  unauthorized,
-  id
+  dryRun,
+  id,
+  pounceStatus
 };

@@ -1,3 +1,8 @@
+/**
+ * This is the interface to probot.
+ * GitHub events trigger prowl events.
+ */
+
 const events = require("./events");
 
 module.exports = robot => {
@@ -5,7 +10,7 @@ module.exports = robot => {
 
   // log all events we hear
   robot.on(`*`, async context => {
-    robot.log(`event: ${context.event}`);
+    context.log(`event: ${context.event}`);
   });
 
   // event specific listeners
