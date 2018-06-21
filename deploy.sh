@@ -5,7 +5,7 @@ set -ev
 docker build -t app .
 
 # Push to DockerHub
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 docker tag app tommilligan/prowl-github-app
 docker push tommilligan/prowl-github-app
 
@@ -14,5 +14,5 @@ heroku update
 heroku container:login
 docker tag app registry.heroku.com/prowl-github-app/web
 docker push registry.heroku.com/prowl-github-app/web
-heroku container:release -a prowl-github-app
+heroku container:release -a prowl-github-app web
 
