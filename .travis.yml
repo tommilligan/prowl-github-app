@@ -13,7 +13,7 @@ script:
 after_success:
   - |
     if [[ $TRAVIS_BRANCH == "master" ]]; then
-      ./deploy.sh
+      ./deploy.sh || exit 1
     fi
 notifications:
   email: false
