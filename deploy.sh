@@ -5,7 +5,7 @@ set -ev
 docker build -t app .
 
 # Push to DockerHub
-echo "$DOCKER_PASsWORD" | docker login -u tommilligan --password-stdin
+echo "$DOCKER_PASsWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 docker tag app tommilligan/prowl-github-app
 docker push tommilligan/prowl-github-app
 
