@@ -13,11 +13,7 @@ script:
 after_success:
   - |
     if [[ $TRAVIS_BRANCH == "master" ]]; then
-      heroku update &&
-      heroku container:login &&
-      heroku container:push -a prowl-github-app web &&
-      heroku container:release -a prowl-github-app web ||
-      exit 1
+      ./deploy.sh
     fi
 notifications:
   email: false
