@@ -34,8 +34,8 @@ targets:
       # only one reviewer has to approve
       reviewers:
         - frontend-lead-user
-	- frontend-dev-1
-	- frontend-dev-2
+        - frontend-dev-1
+        - frontend-dev-2
 
   - id: backend
     stalk:
@@ -45,7 +45,7 @@ targets:
     pounce:
       reviewers:
         - backend-lead-user
-	- backend-dev-1
+        - backend-dev-1
 
   - id: docs
     stalk:
@@ -64,7 +64,7 @@ targets:
       paths:
         - "*.yml"
         - ".env.example"
-	- LICENSE
+        - LICENSE
       base: master
     pounce:
       reviewers:
