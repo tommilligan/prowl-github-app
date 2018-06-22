@@ -12,11 +12,11 @@ Prowl watches your Pull Requests, and merges them whenever they're ready.
 
 ## Use
 
-Prowl looks for `.prowl.yml` in your repo's default branch (usually `master). No action will be taken unless a valid configuration is found.
+Prowl looks for `.prowl.yml` in your repo's default branch (usually `master`). No action will be taken unless a valid configuration is found.
 
 ### Configuration
 
-Your repo has two sets of files, `frontend` and `backend`, which can only be edited by the appropriate teams. `docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
+Sat your repo has two sets of files, `frontend` and `backend`, which can only be edited by the appropriate teams. `docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
 
 A configuration for Prowl might look like this:
 ```yaml
@@ -75,9 +75,41 @@ targets:
     pounce:
       reviewers:
         - backend-lead-user
+
 ```
 
 See the `examples/` directory for more valid `prowl.yml` files.
+
+### Installation
+
+#### Public instance
+
+Details to be confirmed!
+
+#### Private instance
+
+Docker images from `master` are automatically uploaded to [Docker Hub](https://hub.docker.com/r/tommilligan/prowl-github-app).
+These can be run in any compatible environment (for ease Heroku, for reliability AWS).
+You will need to set environment variables as described in `.env.example`.
+
+You'll need to set up a private GitHub app to point to this instance, with the following details:
+- Webhook URL: the root URL of the running image (`https://your.domain.here/`)
+- Permissions:
+| Permission             | Access               | Purpose                                 |
+| ---------------------- | -------------------- | --------------------------------------- |
+| Repository contents    | read & write         | read configuration, merge PRs           |
+| Issues                 | read & write         | read PR commands, write PR comments     |
+| Repository metadata    | read                 |                                         |
+| Pull requests          | read                 | read PR commit info, reviews            |
+| Commit statuses        | read                 | read commit CI status                   |
+- Events:
+| Event                  | Purpose                                 |
+| ---------------------- | --------------------------------------- |
+| Issue comment          | respond to PR commands                  |
+| Pull request review    | check PRs after a successful review     |
+| Status                 | check PRs after CI passes               |
+
+Install this app on the repos you want to watch.
 
 
 ## Development
@@ -85,7 +117,7 @@ See the `examples/` directory for more valid `prowl.yml` files.
 ```sh
 yarn install
 yarn dev
-# and point GitHub event webhook at your host
+# and localtunnel to your machine
 ```
 
 ### Design
@@ -127,6 +159,7 @@ commit status     PR review
                +
                v
           PR details
+          Load config
                +
                v
        ready to merge?
