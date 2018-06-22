@@ -95,6 +95,7 @@ You will need to set environment variables as described in `.env.example`.
 You'll need to set up a private GitHub app to point to this instance, with the following details:
 - Webhook URL: the root URL of the running image (`https://your.domain.here/`)
 - Permissions:
+
 | Permission             | Access               | Purpose                                 |
 | ---------------------- | -------------------- | --------------------------------------- |
 | Repository contents    | read & write         | read configuration, merge PRs           |
@@ -102,14 +103,16 @@ You'll need to set up a private GitHub app to point to this instance, with the f
 | Repository metadata    | read                 |                                         |
 | Pull requests          | read                 | read PR commit info, reviews            |
 | Commit statuses        | read                 | read commit CI status                   |
+
 - Events:
+
 | Event                  | Purpose                                 |
 | ---------------------- | --------------------------------------- |
 | Issue comment          | respond to PR commands                  |
 | Pull request review    | check PRs after a successful review     |
 | Status                 | check PRs after CI passes               |
 
-Install this app on the repos you want to watch.
+Install this app on the repos you want to watch, and you should be good to go!
 
 
 ## Development
