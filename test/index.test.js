@@ -1,6 +1,9 @@
 const { createRobot } = require('probot')
 const app = require('../src')
 
+const getContentConfig = require('./api/getContentConfig')
+const getFiles = require('./api/getFiles')
+const pullRequest = require('./api/pullRequest')
 const statusSuccess = require('./payloads/statusSuccess')
 const issueCommentCreated = require('./payloads/issueCommentCreated')
 
@@ -15,8 +18,15 @@ describe('prowl', () => {
 
     // Mocked GitHub APL
     github = {
+      issues: {
+        createComment: jest.fn().mockReturnValue(Promise.resolve({}))
+      },
       pullRequests: {
-        get: jest.fn().mockReturnValue(Promise.resolve({}))
+        get: jest.fn().mockReturnValue(Promise.resolve(pullRequest)),
+        getFiles: jest.fn().mockReturnValue(Promise.resolve(getFiles))
+      },
+      repos: {
+        getContent: jest.fn().mockReturnValue(Promise.resolve(getContentConfig))
       },
       search: {
         issues: jest.fn().mockReturnValue(Promise.resolve({}))
@@ -49,6 +59,15 @@ describe('prowl', () => {
         repo: 'prowl-target'
       }
       expect(github.pullRequests.get).toHaveBeenCalledWith(q)
+    })
+    it('responds with comment', async () => {
+      await robot.receive(issueCommentCreated)
+      const q = {
+        number: 12,
+        owner: 'tommilligan',
+        repo: 'prowl-target'
+      }
+      expect(github.issues.createComment).toHaveBeenCalledWith(q)
     })
   })
 })

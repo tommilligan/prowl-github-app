@@ -1,0 +1,30 @@
+{"data":{
+  "url": "https://api.github.com/repos/tommilligan/prowl-target-stage/pulls/4",
+  "id": 195659189,
+  "number": 4,
+  "state": "closed",
+  "title": "Pr 4",
+  "user": {
+    "login": "tommilligan"
+  },
+  "body": "",
+  "head": {
+    "label": "tommilligan:pr-4",
+    "ref": "pr-4",
+    "sha": "d3c092ba6eaf9d779308e6ea6562f68baf81a3d5"
+  },
+  "base": {
+    "label": "tommilligan:master",
+    "ref": "master",
+    "sha": "cb3d655bbba53938cea23bf9cc4366e4182fa858"
+  },
+  "merged": true,
+  "mergeable": null,
+  "rebaseable": null,
+  "mergeable_state": "unknown",
+  "commits": 6,
+  "additions": 2,
+  "deletions": 0,
+  "changed_files": 1
+}
+}
