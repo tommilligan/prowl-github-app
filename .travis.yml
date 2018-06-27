@@ -9,7 +9,7 @@ install:
   - yarn --frozen-lockfile
   - mv .env.test .env
 script:
-  - true
+  - yarn run test
 after_success:
   - |
     if [[ $TRAVIS_BRANCH == "master" ]]; then
