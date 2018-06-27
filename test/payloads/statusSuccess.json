@@ -1,0 +1,18 @@
+{
+  "event": "status",
+  "payload": {
+    "sha": "ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72",
+    "name": "tommilligan/prowl-target-stage",
+    "state": "success",
+    "repository": {
+      "name": "prowl-target-stage",
+      "full_name": "tommilligan/prowl-target-stage",
+      "owner": {
+        "login": "tommilligan"
+      }
+    },
+    "installation": {
+      "id": 213002
+    }
+  }
+}

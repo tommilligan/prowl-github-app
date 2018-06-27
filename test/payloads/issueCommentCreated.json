@@ -1,0 +1,30 @@
+{
+  "event": "issue_comment",
+  "payload": {
+    "action": "created",
+    "issue": {
+      "number": 12,
+      "pull_request": {
+        "url": "https://api.github.com/repos/tommilligan/prowl-target/pulls/12",
+        "html_url": "https://github.com/tommilligan/prowl-target/pull/12",
+        "diff_url": "https://github.com/tommilligan/prowl-target/pull/12.diff",
+        "patch_url": "https://github.com/tommilligan/prowl-target/pull/12.patch"
+      }
+    },
+    "comment": {
+      "body": "prowl status"
+    },
+    "repository": {
+      "id": 137407067,
+      "node_id": "MDEwOlJlcG9zaXRvcnkxMzc0MDcwNjc=",
+      "name": "prowl-target",
+      "full_name": "tommilligan/prowl-target",
+      "owner": {
+        "login": "tommilligan"
+      }
+    },
+    "installation": {
+      "id": 210879
+    }
+  }
+}
