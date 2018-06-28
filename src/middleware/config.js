@@ -4,7 +4,7 @@ const utils = require('./utils')
 
 function summariseTargets (targets) {
   return {
-    checkDelay: (Math.max(targets.map(target => target.check_delay || 0)) || 0) * 1000,
+    checkDelay: (Math.max(...targets.map(target => target.check_delay || 0)) || 0) * 1000,
     dryRun: targets.some(target => target.dry_run),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
