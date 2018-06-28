@@ -38,6 +38,8 @@ targets:
         - frontend-dev-2
 
   - id: backend
+    # We don't want to act on the api yet
+    dry_run: true
     stalk:
       paths:
         - "api/**/*"
@@ -48,6 +50,8 @@ targets:
         - backend-dev-1
 
   - id: docs
+    # The docs take a while to start building (s)
+    check_delay: 30
     stalk:
       paths:
         - "**/*.{md,txt}"

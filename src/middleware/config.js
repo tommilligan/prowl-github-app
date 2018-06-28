@@ -4,6 +4,7 @@ const utils = require('./utils')
 
 function summariseTargets (targets) {
   return {
+    checkDelay: (Math.max(targets.map(target => target.check_delay || 0)) || 0) * 1000,
     dryRun: targets.some(target => target.dry_run),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
@@ -73,6 +74,7 @@ module.exports = async (fn, prowl, ...args) => {
       const config = yaml.safeLoad(buf.toString('utf8'))
       const prConfig = await calculatePRConfig(prowl, config)
 
+      context.log.info(`${pr.url}: moving to logic`)
       return fn(
         {
           ...prowl,

@@ -18,6 +18,7 @@ async function prComment (prowl, body) {
   const { context, pr } = prowl
   const { number } = pr
 
+  context.log.info(`${pr.url}: commenting '${body.slice(0, 16)}...'`)
   return context.github.issues.createComment(
     context.repo({
       number,
@@ -41,7 +42,7 @@ async function wetRun (prowl, action, message) {
       time: new Date().toISOString(),
       message
     }
-    prComment(prowl, commentBodies.dryRun(payload))
+    await prComment(prowl, commentBodies.dryRun(payload))
     return null
   }
 }

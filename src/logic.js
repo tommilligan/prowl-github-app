@@ -9,8 +9,6 @@ const actions = require('./actions')
 const commentBodies = require('./commentBodies')
 const utils = require('./utils')
 
-const checkDelay = 1000
-
 const prPounceStatus = async prowl => {
   const { context, config, pr } = prowl
 
@@ -75,7 +73,8 @@ const conditionsCheck = conditions => {
 }
 
 const prMergeTry = async prowl => {
-  const { context, pr } = prowl
+  const { context, pr, config } = prowl
+  const { checkDelay } = config
   context.log.info(`${pr.url}: delaying check for ${checkDelay}ms`)
   await utils.sleep(checkDelay)
 
@@ -100,19 +99,16 @@ const prowlCommand = async (prowl, command) => {
   switch (command) {
     case 'status': {
       const conditions = await prPounceStatus(prowl)
-      actions.prComment(prowl, commentBodies.pounceStatus(conditions))
-      break
+      return actions.prComment(prowl, commentBodies.pounceStatus(conditions))
     }
     case 'config': {
-      actions.prComment(prowl, commentBodies.config(config))
-      break
+      return actions.prComment(prowl, commentBodies.config(config))
     }
     case 'id': {
-      actions.prComment(prowl, commentBodies.id(process.env.APP_ID))
-      break
+      return actions.prComment(prowl, commentBodies.id(process.env.APP_ID))
     }
     default: {
-      break
+      return null
     }
   }
 }

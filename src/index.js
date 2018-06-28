@@ -10,17 +10,24 @@ module.exports = robot => {
 
   // log all events we hear
   robot.on(`*`, async context => {
-    context.log(`event: ${context.event}`)
+    return context.log(`event: ${context.event}`)
   })
 
   // event specific listeners
   robot.on('issue_comment.created', async context => {
-    events.issueComment({ robot, context })
+    return events.issueComment({ robot, context })
   })
   robot.on('pull_request_review.submitted', async context => {
-    events.pullRequestReview({ robot, context })
+    return events.pullRequestReview({ robot, context })
+  })
+  robot.on([
+    'pull_request.opened',
+    'pull_request.reopened',
+    'pull_request.synchronize'
+  ], async context => {
+    return events.pullRequest({ robot, context })
   })
   robot.on('status', async context => {
-    events.status({ robot, context })
+    return events.status({ robot, context })
   })
 }

@@ -30,7 +30,7 @@ const issueComment = async prowl => {
       )
       // and forward for action
       context.log.info(`${pr.url}: command ${comment.body}`)
-      withConfig(
+      return withConfig(
         logic.prowlCommand,
         {
           ...prowl,
@@ -53,7 +53,18 @@ const pullRequestReview = async prowl => {
       })
     )
     context.log.info(`${pr.url}: ${review.user.login} ${review.state}`)
-    withConfig(logic.prMergeTry, { ...prowl, pr })
+    return withConfig(logic.prMergeTry, { ...prowl, pr })
+  }
+}
+
+const pullRequest = async prowl => {
+  const { context } = prowl
+  const { pull_request: pr, action } = context.payload
+
+  if (pr.state === 'open') {
+    context.log.info(`${pr.url}: ${action} ${pr.state}`)
+
+    return withConfig(logic.prMergeTry, { ...prowl, pr })
   }
 }
 
@@ -73,7 +84,7 @@ const status = async prowl => {
     })
 
     // for each PR
-    prs.data.items.forEach(async item => {
+    const pArray = prs.data.items.map(async item => {
       const { data: pr } = await context.github.pullRequests.get(
         context.repo({
           number: item.number
@@ -85,14 +96,17 @@ const status = async prowl => {
         context.log.info(
           `${pr.url}: HEAD (${sha.slice(0, 7)}) status ${state}`
         )
-        withConfig(logic.prMergeTry, { ...prowl, pr })
+        return withConfig(logic.prMergeTry, { ...prowl, pr })
       }
     })
+    // wait for our async array for testing purposes
+    return Promise.all(pArray)
   }
 }
 
 module.exports = {
   issueComment,
+  pullRequest,
   pullRequestReview,
   status
 }

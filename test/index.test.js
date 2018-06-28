@@ -1,11 +1,21 @@
 const { createRobot } = require('probot')
 const app = require('../src')
 
+const getCombinedStatusForRef = require('./api/getCombinedStatusForRef')
 const getContentConfig = require('./api/getContentConfig')
 const getFiles = require('./api/getFiles')
+const getReviews = require('./api/getReviews')
+const merge = require('./api/merge')
 const pullRequest = require('./api/pullRequest')
-const statusSuccess = require('./payloads/statusSuccess')
+const searchIssues = require('./api/searchIssues')
+
 const issueCommentCreated = require('./payloads/issueCommentCreated')
+const pullRequestReopened = require('./payloads/pullRequestReopened')
+const statusSuccess = require('./payloads/statusSuccess')
+
+function mockApi (content) {
+  return jest.fn().mockReturnValue(Promise.resolve(content))
+}
 
 describe('prowl', () => {
   let robot
@@ -18,18 +28,28 @@ describe('prowl', () => {
 
     // Mocked GitHub APL
     github = {
+      gitdata: {
+        deleteReference: mockApi({
+          did: 'delete ref'
+        })
+      },
       issues: {
-        createComment: jest.fn().mockReturnValue(Promise.resolve({}))
+        createComment: mockApi({
+          did: 'create comment'
+        })
       },
       pullRequests: {
-        get: jest.fn().mockReturnValue(Promise.resolve(pullRequest)),
-        getFiles: jest.fn().mockReturnValue(Promise.resolve(getFiles))
+        get: mockApi(pullRequest),
+        getFiles: mockApi(getFiles),
+        getReviews: mockApi(getReviews),
+        merge: mockApi(merge)
       },
       repos: {
-        getContent: jest.fn().mockReturnValue(Promise.resolve(getContentConfig))
+        getContent: mockApi(getContentConfig),
+        getCombinedStatusForRef: mockApi(getCombinedStatusForRef)
       },
       search: {
-        issues: jest.fn().mockReturnValue(Promise.resolve({}))
+        issues: mockApi(searchIssues)
       }
     }
 
@@ -37,37 +57,58 @@ describe('prowl', () => {
     robot.auth = () => Promise.resolve(github)
   })
 
-  describe('on status success', () => {
-    it('searches for prs', async () => {
+  describe('status', () => {
+    it('looks up prs from search', async () => {
       await robot.receive(statusSuccess)
-      const q = {
+      expect(github.search.issues).toHaveBeenCalledWith({
         order: 'desc',
-        q:
-          'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72 repo:tommilligan/prowl-target-stage type:pr',
+        q: 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72 repo:tommilligan/prowl-target-stage type:pr',
         sort: 'updated'
-      }
-      expect(github.search.issues).toHaveBeenCalledWith(q)
+      })
+      expect(github.pullRequests.get).toHaveBeenCalledWith({
+        number: 5,
+        owner: 'tommilligan',
+        repo: 'prowl-target-stage'
+      })
+      expect(github.pullRequests.merge).toHaveBeenCalledWith({
+        commit_title: 'Pr 5 (#5)',
+        merge_method: 'squash',
+        number: 5,
+        owner: 'tommilligan',
+        repo: 'prowl-target-stage',
+        sha: 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72'
+      })
+      expect(github.gitdata.deleteReference).toHaveBeenCalledWith({
+        owner: 'tommilligan',
+        ref: 'heads/pr-5',
+        repo: 'prowl-target-stage'
+      })
     })
   })
 
-  describe('on comment command', () => {
-    it('gets pr details', async () => {
-      await robot.receive(issueCommentCreated)
-      const q = {
-        number: 12,
-        owner: 'tommilligan',
-        repo: 'prowl-target'
-      }
-      expect(github.pullRequests.get).toHaveBeenCalledWith(q)
+  describe('pr opening', () => {
+    it('checks pr with inline data', async () => {
+      await robot.receive(pullRequestReopened)
+      expect(github.search.issues).toHaveBeenCalledTimes(0)
+      expect(github.pullRequests.get).toHaveBeenCalledWith({
+        number: 1,
+        owner: 'Codertocat',
+        repo: 'Hello-World'
+      })
+      // Will not merge as the original PR mock doesnt match sha
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
     })
-    it('responds with comment', async () => {
+  })
+
+  describe('comment command', () => {
+    it('responds with a comment', async () => {
       await robot.receive(issueCommentCreated)
-      const q = {
+      expect(github.pullRequests.get).toHaveBeenCalledWith({
         number: 12,
         owner: 'tommilligan',
         repo: 'prowl-target'
-      }
-      expect(github.issues.createComment).toHaveBeenCalledWith(q)
+      })
+      expect(github.issues.createComment).toHaveBeenCalled()
     })
   })
 })
