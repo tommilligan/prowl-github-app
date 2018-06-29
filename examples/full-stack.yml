@@ -4,26 +4,51 @@ targets:
   - id: frontend
     stalk:
       paths:
-        - "**/*.{js,ts}"
+        - "ui/**/*"
       base: master
     pounce:
       reviewers:
-        - tom-smith
-        - terry-burns
+        - frontend-lead-user
+        - frontend-dev-1
+        - frontend-dev-2
+
   - id: backend
+    check_delay: 20
     stalk:
       paths:
         - "api/**/*"
       base: master
     pounce:
       reviewers:
-        - neil-xu
-  - id: documentation
+        - backend-lead-user
+        - backend-dev-1
+
+  - id: docs
     stalk:
       paths:
-        - "README.md"
-        - "LICENSE"
+        - "**/*.{md,txt}"
       base: master
     pounce:
+      # No reviews are necessary
+      # Once CI completes, the PR will be merged
       reviewers: []
+
+  # These targets watch the same files
+  # Both targets must be satisfied before prowl acts
+  - id: config-frontend
+    stalk: &config-files
+      paths:
+        - "*.yml"
+        - ".env.example"
+        - LICENSE
+      base: master
+    pounce:
+      reviewers:
+        - frontend-lead-user
+  - id: config-backend
+    stalk:
+      <<: *config-files
+    pounce:
+      reviewers:
+        - backend-lead-user
 

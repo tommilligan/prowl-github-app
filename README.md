@@ -16,73 +16,51 @@ Prowl looks for `.prowl.yml` in your repo's default branch (usually `master`). N
 
 ### Configuration
 
-Sat your repo has two sets of files, `frontend` and `backend`, which can only be edited by the appropriate teams. `docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
+**prowl** has PR `targets` it watches for. A PR matching `stalk` will be reviwed on each update - when `pounce` if fulfilled, the PR will be merged.
 
-A configuration for Prowl might look like this:
 ```yaml
+
+# Config version
 version: '0.1.0'
 
 targets:
+
+  # Unique id for this target
   - id: frontend
-    # decides what prowl watches
+
+    # What prowl watches
     stalk:
+      # PR changed files. Triggers if any path matches any file
       paths:
         - "ui/**/*"
+      # PR base branch
       base: master
-    # decides when prowl acts
+
+    # When prowl merges
     pounce:
-      # only one reviewer has to approve
+      # PR reviewers. Only one approval required
       reviewers:
         - frontend-lead-user
         - frontend-dev-1
         - frontend-dev-2
 
-  - id: backend
-    # We don't want to act on the api yet
+    # Write comments instead of other actions
     dry_run: true
-    stalk:
-      paths:
-        - "api/**/*"
-      base: master
-    pounce:
-      reviewers:
-        - backend-lead-user
-        - backend-dev-1
 
-  - id: docs
-    # The docs take a while to start building (s)
-    check_delay: 30
-    stalk:
-      paths:
-        - "**/*.{md,txt}"
-      base: master
-    pounce:
-      # No reviewers necessary
-      # Once CI completes, prowl will merge immediately
-      reviewers: []
-
-  # These targets watch the same files
-  # Both targets must be satisfied before prowl acts
-  - id: config-frontend
-    stalk: &config-files
-      paths:
-        - "*.yml"
-        - ".env.example"
-        - LICENSE
-      base: master
-    pounce:
-      reviewers:
-        - frontend-lead-user
-  - id: config-backend
-    stalk:
-      <<: *config-files
-    pounce:
-      reviewers:
-        - backend-lead-user
-
+    # Delay PR checks to allow CI to start (seconds)
+    check_delay: 90
 ```
 
-See the `examples/` directory for more valid `prowl.yml` files.
+#### Multi-target PRs
+
+PRs matching more than one `target` will only be merged when **all targets are passed**.
+This means at least **one reviewer from each target must approve the PR**.
+
+Say your repo has two sets of files, `frontend` and `backend`, which can only be edited by the appropriate teams. `docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
+
+A configuration for Prowl might look [like this](examples/full-stack.yaml).
+
+See the [examples](examples) directory for more valid `prowl.yml` files.
 
 ### Installation
 
@@ -113,6 +91,7 @@ You'll need to set up a private GitHub app to point to this instance, with the f
 | Event                  | Purpose                                 |
 | ---------------------- | --------------------------------------- |
 | Issue comment          | respond to PR commands                  |
+| Pull request           | check PRs when opened or updated        |
 | Pull request review    | check PRs after a successful review     |
 | Status                 | check PRs after CI passes               |
 
