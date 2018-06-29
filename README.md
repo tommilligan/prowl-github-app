@@ -66,13 +66,13 @@ targets:
 
 ### Merge strategy
 
-Currently, `prowl` only supports merging by the `squash` strategy. If you'd like other option, please open an issue!
+Currently, `prowl` only supports merging by the `squash` strategy. If you'd like other options, please open an issue!
 
 ### Multi-target PRs
 
 PRs matching more than one `target` will only be merged when **all targets are passed**.
 
-This [more realistic configuration](examples/full-stack.yaml) has two sets of files, `frontend` and `backend`, which can only be merged by the appropriate teams.
+This [more realistic configuration](examples/full-stack.yml) has two sets of files, `frontend` and `backend`, which can only be merged by the appropriate teams.
 `docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
 
 See the [examples](examples) directory for more `prowl.yml` ideas.
