@@ -1,22 +1,34 @@
-# prowl-github-app
+
+<p align="center">
+  <img src="static/cats-eye.png" alt="prowl-icon" height="150" width="155">
+  <h1 align="center">prowl</h1>
+</p>
+<p align="center" style="font-size: 1.2rem;">stalks your pull requests, so you don't have to</p>
+
+Prowl is a stateless, declarative GitHub bot powered by [Probot](https://github.com/probot/probot). It listens for updates from your repositories, and merges pull requests only when your custom criteria are met. It works purely from the GitHub API, with no internal storage to manage. Power through your PR reviews, safe in the knowledge Prowl know what's safe to merge to master.
 
 [![license](https://img.shields.io/github/license/tommilligan/prowl-github-app.svg)]()
-
 [![Travis branch](https://img.shields.io/travis/tommilligan/prowl-github-app/master.svg)](https://travis-ci.org/tommilligan/prowl-github-app)
 [![codecov](https://codecov.io/gh/tommilligan/prowl-github-app/branch/master/graph/badge.svg)](https://codecov.io/gh/tommilligan/prowl-github-app)
 [![David](https://img.shields.io/david/tommilligan/prowl-github-app.svg)](https://david-dm.org/tommilligan/prowl-github-app)
+[![Docker Pulls](https://img.shields.io/docker/pulls/tommilligan/prowl-github-app.svg)](https://hub.docker.com/r/tommilligan/prowl-github-app/)
 
-Prowl watches your Pull Requests, and merges them whenever they're ready.
-
-> built with [Probot](https://github.com/probot/probot)
 
 ## Use
 
-Prowl looks for `.prowl.yml` in your repo's default branch (usually `master`). No action will be taken unless a valid configuration is found.
+Once installed (see below), prowl will run in the background with no input from you.
+
+If you want to check on what it's thinking, you can summon it in a PR by commenting **exactly**:
+- `prowl config`: show the calculated configuration for this PR
+- `prowl status`: show prowl's evaluation of this PR
+
+> Press `Ctrl+Enter` to immediately submit a prowl command
 
 ### Configuration
 
-**prowl** has PR `targets` it watches for. A PR matching `stalk` will be reviwed on each update - when `pounce` if fulfilled, the PR will be merged.
+Prowl looks for `.prowl.yml` in your repo's default branch (usually `master`). No action will be taken unless a valid configuration is found.
+
+Prowl can watch multiple PR `targets` . A PR matching `stalk` will be reviwed on each update - when `pounce` if fulfilled, the PR will be merged.
 
 ```yaml
 
@@ -26,13 +38,13 @@ version: '0.1.0'
 targets:
 
   # Unique id for this target
-  - id: frontend
+  - id: my-code-source
 
     # What prowl watches
     stalk:
       # PR changed files. Triggers if any path matches any file
       paths:
-        - "ui/**/*"
+        - "src/**/*"
       # PR base branch
       base: master
 
@@ -40,9 +52,8 @@ targets:
     pounce:
       # PR reviewers. Only one approval required
       reviewers:
-        - frontend-lead-user
-        - frontend-dev-1
-        - frontend-dev-2
+        - tommilligan
+        - octocat  
 
     # Write comments instead of other actions
     dry_run: true
