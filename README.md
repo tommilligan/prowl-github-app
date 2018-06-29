@@ -16,8 +16,6 @@ Prowl is a stateless, declarative GitHub bot powered by [Probot](https://github.
 
 # prowl-github-app
 
-[TOC]
-
 ## Use
 
 Once installed (see below), prowl will run in the background with no input from you.
@@ -70,24 +68,22 @@ targets:
 
 Currently, `prowl` only supports merging by the `squash` strategy. If you'd like other option, please open an issue!
 
-#### Multi-target PRs
+### Multi-target PRs
 
 PRs matching more than one `target` will only be merged when **all targets are passed**.
-This means at least **one reviewer from each target must approve the PR**.
 
-Say your repo has two sets of files, `frontend` and `backend`, which can only be edited by the appropriate teams. `docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
+This [more realistic configuration](examples/full-stack.yaml) has two sets of files, `frontend` and `backend`, which can only be merged by the appropriate teams.
+`docs` can be edited by anyone, and `config` has to have joint approval from the two team leads.
 
-A configuration for Prowl might look [like this](examples/full-stack.yaml).
+See the [examples](examples) directory for more `prowl.yml` ideas.
 
-See the [examples](examples) directory for more valid `prowl.yml` files.
+## Installation
 
-### Installation
-
-#### Public instance
+### Public instance
 
 Details to be confirmed!
 
-#### Private instance
+### Private instance
 
 Docker images from `master` are automatically uploaded to [Docker Hub](https://hub.docker.com/r/tommilligan/prowl-github-app).
 These can be run in any compatible environment (for ease Heroku, for reliability AWS).
@@ -140,18 +136,14 @@ stateless checks +------> GitHub API
 actions          +---------+
 ```
 
-**prowl** is a stateless node.js webapp.
-
-Bootstrapped from [probot](https://github.com/probot/probot), it listens for events from GitHub's events API and responds with actions. It has no internal state (DB, in-memory cache, container fs, etc.), which makes it easy to reason about.
-
-All inputs are driven by the target repo.
-
-
-### Workflow
-
 On each event, a preliminary check is run to see if it looks interesting.
 
-If the event _could_ trigger a merge, all checks are run through in full.
+If the event _could_ trigger a merge, all checks are run through in full. Each layer is more involved:
+- index - listen for webhooks
+- events - filter out interesting events
+- middleware - load and calculate config
+- logic - work out which actions to apply
+- actions - act (unless `dry_run` is set)
 
 ```
 commit status     PR review
