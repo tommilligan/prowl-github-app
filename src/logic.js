@@ -31,6 +31,12 @@ const prPounceStatus = async prowl => {
     pass: !!prCheck.mergeable,
     value: prCheck.mergeable
   })
+  // check PR is open
+  conditions.push({
+    description: 'PR is open',
+    pass: prCheck.state === 'open',
+    value: prCheck.state
+  })
 
   // check commit is success
   const {
@@ -62,35 +68,45 @@ const prPounceStatus = async prowl => {
   conditions.push({
     description: 'Required reviewers approved',
     pass: approved,
-    value: [config.reviewerGroups, approvedReviewers]
+    value: {
+      approved: approvedReviewers,
+      required: config.reviewerGroups
+    }
   })
 
   return conditions
 }
 
-const conditionsCheck = conditions => {
+const conditionsCheck = (prowl, conditions) => {
+  const {context, pr} = prowl
+  context.log.debug(`${pr.url}: checking conditions ${JSON.stringify(conditions)}`)
   return conditions.every(condition => condition.pass)
 }
 
 const prMergeTry = async prowl => {
   const { context, pr, config } = prowl
-  const { checkDelay } = config
-  context.log.info(`${pr.url}: delaying check for ${checkDelay}ms`)
-  await utils.sleep(checkDelay)
+  const { checkDelay, stalk } = config
 
-  const conditions = await prPounceStatus(prowl)
-  const prReady = conditionsCheck(conditions)
-
-  if (prReady) {
-    context.log.info(`${pr.url}: ready for merge`)
-    // const comment = context.repo({
-    //   number: pr.number,
-    //   body: commentBodies.merge(conditions)
-    // });
-    // context.github.issues.createComment(comment);
-    return actions.prMerge(prowl)
+  if (!stalk) {
+    return null
   } else {
-    context.log.info(`${pr.url}: not ready for merge`)
+    context.log.info(`${pr.url}: delaying check for ${checkDelay}ms`)
+    await utils.sleep(checkDelay)
+
+    const conditions = await prPounceStatus(prowl)
+    const prReady = conditionsCheck(prowl, conditions)
+
+    if (prReady) {
+      context.log.info(`${pr.url}: ready for merge`)
+      // const comment = context.repo({
+      //   number: pr.number,
+      //   body: commentBodies.merge(conditions)
+      // });
+      // context.github.issues.createComment(comment);
+      return actions.prMerge(prowl)
+    } else {
+      context.log.info(`${pr.url}: not ready for merge`)
+    }
   }
 }
 

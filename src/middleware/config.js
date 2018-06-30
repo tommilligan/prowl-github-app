@@ -6,17 +6,20 @@ function summariseTargets (targets) {
   return {
     checkDelay: (Math.max(...targets.map(target => target.check_delay || 0)) || 0) * 1000,
     dryRun: targets.some(target => target.dry_run),
+    ids: targets.map(target => target.id),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
       .filter(reviewers => {
         return reviewers && reviewers.length > 1
-      })
+      }),
+    stalk: targets.length > 0
   }
 }
 
 /**
  * Given the existing pr and raw config, calculate which targets match
  * @param {*} prowl
+ * @returns {False | config}
  */
 async function calculatePRConfig (prowl, config) {
   const { context, pr } = prowl
