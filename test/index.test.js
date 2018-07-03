@@ -1,4 +1,4 @@
-const { createRobot } = require('probot')
+const { Application } = require('probot')
 const app = require('../src')
 
 const getCombinedStatusForRef = require('./api/getCombinedStatusForRef')
@@ -23,8 +23,8 @@ describe('prowl', () => {
 
   beforeEach(() => {
     // Create mock app instance
-    robot = createRobot()
-    app(robot)
+    robot = new Application()
+    robot.load(app)
 
     // Mocked GitHub APL
     github = {
