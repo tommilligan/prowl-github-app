@@ -85,15 +85,25 @@ Details to be confirmed!
 
 ### Private instance
 
+#### Source
+
 Docker images from `master` are automatically uploaded to [Docker Hub](https://hub.docker.com/r/tommilligan/prowl-github-app).
-These can be run in any compatible environment (for ease Heroku, for reliability AWS).
+
+#### Host
+
+Your instance of prowl needs to be accessible at a public URL such as:
+- `https://prowl.your-domain.com/`
+- `https://your-domain.com/prowl`
 
 You will need to set environment variables as described in `.env.example`. In production, you'll also want:
 - `LOG_FORMAT=json` for structured log draining
 - `PRIVATE_KEY=$(cat <your/private-key.pem>)`, [see here](https://probot.github.io/docs/deployment/#deploy-the-app). In development, just add a `*.pem` file to your working directory.
 
+#### GitHub Register
+
 You'll need to set up a private GitHub app to point to this instance, with the following details:
-- Webhook URL: the root URL of the running image (`https://your.domain.here/`)
+- Name: `prowl-<your-custom-name>`
+- Webhook URL: the URL of the running app
 - Permissions:
 
 | Permission             | Access               | Purpose                                 |
@@ -113,7 +123,11 @@ You'll need to set up a private GitHub app to point to this instance, with the f
 | Pull request review    | check PRs after a successful review     |
 | Status                 | check PRs after CI passes               |
 
-Install this app on the repos you want to watch, and you should be good to go!
+#### GitHub Install
+
+Install this app on a repo for prowl to start revieving webhooks for it.
+
+No action will be taken until a valid `.prowl.yml` is found in the repository.
 
 
 ## Development
