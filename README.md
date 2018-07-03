@@ -125,7 +125,7 @@ You'll need to set up a private GitHub app to point to this instance, with the f
 
 #### GitHub Install
 
-Install this app on a repo for prowl to start revieving webhooks for it.
+Install this app on a repo for prowl to start recieving webhooks for it.
 
 No action will be taken until a valid `.prowl.yml` is found in the repository.
 
