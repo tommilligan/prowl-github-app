@@ -4,7 +4,7 @@ const issueCommentCreated = require('./payloads/issueCommentCreated')
 const pullRequestReopened = require('./payloads/pullRequestReopened')
 const statusSuccess = require('./payloads/statusSuccess')
 
-describe('prowl', () => {
+describe('happy path', () => {
   let robot
   let github
 
@@ -52,8 +52,7 @@ describe('prowl', () => {
         owner: 'Codertocat',
         repo: 'Hello-World'
       })
-      // Will not merge as the original PR mock doesnt match sha
-      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
     })
   })
 
