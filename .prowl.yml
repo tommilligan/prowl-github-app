@@ -10,4 +10,5 @@ targets:
       base: master
     pounce:
       reviewers: []
+    dry_run: true
 
