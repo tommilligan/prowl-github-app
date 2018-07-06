@@ -9,5 +9,8 @@ targets:
         - "**/*"
       base: master
     pounce:
+      check_delay: 10
+      delete: true
+      merge_method: merge
       reviewers: []
 
