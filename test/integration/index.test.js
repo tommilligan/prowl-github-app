@@ -1,63 +1,17 @@
-const { createRobot } = require('probot')
-const app = require('../src')
-
-const getCombinedStatusForRef = require('./api/getCombinedStatusForRef')
-const getContentConfig = require('./api/getContentConfig')
-const getFiles = require('./api/getFiles')
-const getReviews = require('./api/getReviews')
-const merge = require('./api/merge')
-const pullRequest = require('./api/pullRequest')
-const searchIssues = require('./api/searchIssues')
+const {mockRobot, mockGithub} = require('./utils')
 
 const issueCommentCreated = require('./payloads/issueCommentCreated')
 const pullRequestReopened = require('./payloads/pullRequestReopened')
 const statusSuccess = require('./payloads/statusSuccess')
 
-function mockApi (content) {
-  return jest.fn().mockReturnValue(Promise.resolve(content))
-}
-
-describe('prowl', () => {
+describe('happy path', () => {
   let robot
   let github
 
   beforeEach(() => {
-    // Create mock app instance
-    robot = createRobot()
-    app(robot)
-
-    // Mocked GitHub API
-    github = {
-      paginate: async function (fn, cb) {
-        return fn.then(cb)
-      },
-      gitdata: {
-        deleteReference: mockApi({
-          did: 'delete ref'
-        })
-      },
-      issues: {
-        createComment: mockApi({
-          did: 'create comment'
-        })
-      },
-      pullRequests: {
-        get: mockApi(pullRequest),
-        getFiles: mockApi(getFiles),
-        getReviews: mockApi(getReviews),
-        merge: mockApi(merge)
-      },
-      repos: {
-        getContent: mockApi(getContentConfig),
-        getCombinedStatusForRef: mockApi(getCombinedStatusForRef)
-      },
-      search: {
-        issues: mockApi(searchIssues)
-      }
-    }
-
-    // Passes the mocked out GitHub API into out robot instance
-    robot.auth = () => Promise.resolve(github)
+    // Happy path - no modifications to github
+    github = mockGithub()
+    robot = mockRobot(github)
   })
 
   describe('status', () => {
@@ -98,8 +52,8 @@ describe('prowl', () => {
         owner: 'Codertocat',
         repo: 'Hello-World'
       })
-      // Will not merge as the original PR mock doesnt match sha
-      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
+      expect(github.gitdata.deleteReference).toHaveBeenCalledTimes(1)
     })
   })
 
