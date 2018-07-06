@@ -15,7 +15,7 @@ const dryRun = payload =>
     }**.`,
     payload
   )
-const error = o => commentWithJSON(`There was an error processing an event relevant to this PR:`, o)
+const error = o => commentWithJSON(`An event was not processed due to the following error:`, o)
 const id = s => `GitHub app id is \`${s}\``
 const pounceStatus = o => commentWithJSON(`Status of this PR:`, o)
 
