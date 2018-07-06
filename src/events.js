@@ -77,14 +77,17 @@ const status = async prowl => {
     // if the status update was a success
     // search for PRs containing the commit
     const q = `${sha} repo:${repo} type:pr`
-    const prs = await context.github.search.issues({
-      q,
-      sort: 'updated',
-      order: 'desc'
-    })
+    const prs = await context.github.paginate(
+      context.github.search.issues({
+        q,
+        sort: 'updated',
+        order: 'desc'
+      }),
+      res => res.data.items
+    )
 
     // for each PR
-    const pArray = prs.data.items.map(async item => {
+    const pArray = prs.map(async item => {
       const { data: pr } = await context.github.pullRequests.get(
         context.repo({
           number: item.number

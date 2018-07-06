@@ -25,8 +25,11 @@ async function calculatePRConfig (prowl, config) {
   const { context, pr } = prowl
 
   // Get files changed in this pr
-  const { data: dirtyFiles } = await context.github.pullRequests.getFiles(
-    context.repo({ number: pr.number, per_page: 100 })
+  const dirtyFiles = await context.github.paginate(
+    context.github.pullRequests.getFiles(
+      context.repo({ number: pr.number, per_page: 100 })
+    ),
+    res => res.data
   )
   const dirtyFilePaths = dirtyFiles.map(f => f.filename)
 
