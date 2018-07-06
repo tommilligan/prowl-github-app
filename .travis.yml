@@ -12,10 +12,11 @@ script:
   - yarn run test
 after_success:
   - |
-    if [[ $TRAVIS_BRANCH == "master" ]]; then
+    if [[ ( $TRAVIS_BRANCH == "master" ) && ( $TRAVIS_PULL_REQUEST == "false" ) ]]; then
       ./deploy.sh || exit 1
     fi
 notifications:
   email: false
 cache:
   yarn: true
+
