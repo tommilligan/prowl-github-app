@@ -28,6 +28,9 @@ describe('prowl', () => {
 
     // Mocked GitHub APL
     github = {
+      paginate: async function (fn, cb) {
+        return fn.then(cb)
+      },
       gitdata: {
         deleteReference: mockApi({
           did: 'delete ref'

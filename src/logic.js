@@ -51,8 +51,11 @@ const prPounceStatus = async prowl => {
   })
 
   // PR reviews
-  const { data: prReviews } = await context.github.pullRequests.getReviews(
-    context.repo({ number: pr.number, per_page: 100 })
+  const prReviews = await context.github.paginate(
+    context.github.pullRequests.getReviews(
+      context.repo({ number: pr.number, per_page: 100 })
+    ),
+    res => res.data
   )
   const approvedReviewers = prReviews
     .filter(review => {
