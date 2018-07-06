@@ -26,7 +26,7 @@ describe('prowl', () => {
     robot = createRobot()
     app(robot)
 
-    // Mocked GitHub APL
+    // Mocked GitHub API
     github = {
       paginate: async function (fn, cb) {
         return fn.then(cb)
