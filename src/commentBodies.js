@@ -7,7 +7,7 @@ const commentWithJSON = (s, o) => `${s}
 ${jsonBlock(o)}`
 
 // Comments
-const config = o => commentWithJSON(`Prowl config for this PR:`, o)
+const config = o => commentWithJSON(`Config for this PR:`, o)
 const dryRun = payload =>
   commentWithJSON(
     `If this wasn't a [dry run](${payload.configUrl}), I would have **${
@@ -15,12 +15,14 @@ const dryRun = payload =>
     }**.`,
     payload
   )
-const id = s => `prowl app id is \`${s}\``
+const error = o => commentWithJSON(`There was an error processing an event relevant to this PR:`, o)
+const id = s => `GitHub app id is \`${s}\``
 const pounceStatus = o => commentWithJSON(`Status of this PR:`, o)
 
 module.exports = {
   config,
   dryRun,
+  error,
   id,
   pounceStatus
 }

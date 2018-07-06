@@ -13,12 +13,12 @@ targets:
         - frontend-dev-2
 
   - id: backend
-    check_delay: 20
     stalk:
       paths:
         - "api/**/*"
       base: master
     pounce:
+      check_delay: 20
       reviewers:
         - backend-lead-user
         - backend-dev-1

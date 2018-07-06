@@ -1,12 +1,45 @@
 const yaml = require('js-yaml')
+const uniq = require('lodash.uniq')
 
+const actions = require('../actions')
+const commentBodies = require('../commentBodies')
 const utils = require('./utils')
 
+/**
+ * Decide what merge method we should use later
+ * If no values given, `squash` will be used
+ * If more than one method is given, an error will be thrown.
+ * @param {} targets
+ */
+function summariseMergeMethod (targets) {
+  const mergeMethods = uniq(
+    targets
+      .map(target => target.tactic.merge_method)
+      // filter out falsey values like undefined
+      .filter(m => m)
+  )
+
+  if (mergeMethods.length === 1) {
+    return mergeMethods[0]
+  } else if (mergeMethods.length === 0) {
+    return 'squash'
+  } else {
+    throw new Error(`More than one merge_method was specified: ${mergeMethods}`)
+  }
+}
+
+/**
+ * Summarise a .prowl.yml with multiple targets into one internal config
+ * relevant to the current PR.
+ * @param {*} targets
+ */
 function summariseTargets (targets) {
   return {
-    checkDelay: (Math.max(...targets.map(target => target.check_delay || 0)) || 0) * 1000,
-    dryRun: targets.some(target => target.dry_run),
+    checkDelay: (Math.max(...targets.map(target => target.pounce.check_delay || 0)) || 0) * 1000,
+    delete: targets.every(target => target.tactic.delete),
+    dryRun: targets.some(target => target.tactic.dry_run),
     ids: targets.map(target => target.id),
+    mergeMethod: summariseMergeMethod(targets),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
       .filter(reviewers => {
@@ -86,8 +119,13 @@ module.exports = async (fn, prowl, ...args) => {
         ...args
       )
     } catch (e) {
-      context.log.error('Error loading prowl config')
-      context.log.error(e)
+      context.log.warn(e)
+      context.log.warn(`${pr.url}: Error loading prowl config`)
+      actions.prComment(prowl, commentBodies.error({
+        event: context.event,
+        pr: pr.url,
+        message: e.message
+      }))
     }
   }
 }
