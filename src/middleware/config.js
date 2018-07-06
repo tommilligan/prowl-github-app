@@ -14,7 +14,7 @@ const utils = require('./utils')
 function summariseMergeMethod (targets) {
   const mergeMethods = uniq(
     targets
-      .map(target => target.tactic.merge_method)
+      .map(target => target.pounce.merge_method)
       // filter out falsey values like undefined
       .filter(m => m)
   )
@@ -36,8 +36,8 @@ function summariseMergeMethod (targets) {
 function summariseTargets (targets) {
   return {
     checkDelay: (Math.max(...targets.map(target => target.pounce.check_delay || 0)) || 0) * 1000,
-    delete: targets.every(target => target.tactic.delete),
-    dryRun: targets.some(target => target.tactic.dry_run),
+    delete: targets.every(target => target.pounce.delete || true),
+    dryRun: targets.some(target => target.pounce.dry_run || false),
     ids: targets.map(target => target.id),
     mergeMethod: summariseMergeMethod(targets),
     reviewerGroups: targets

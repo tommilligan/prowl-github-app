@@ -57,13 +57,15 @@ targets:
       reviewers:
         - tommilligan
         - octocat  
+
       # Delay PR checks to allow CI to start (seconds)
       # default: 0
       # accumulator: max value is used
       check_delay: 90
-
-    # What actions prowl takes
-    tactic:
+      # whether to delete PR branches following a merge
+      # default: true
+      # accumulator: every
+      delete: false
       # Write comments instead of other actions
       # default: false
       # accumulator: some
@@ -73,10 +75,6 @@ targets:
       # default: squash
       # accumulator: error if more than one unique value
       merge_method: merge
-      # whether to delete PR branches following a merge
-      # default: true
-      # accumulator: every
-      delete: false
 
 ```
 
