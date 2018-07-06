@@ -1,4 +1,4 @@
-const {mockRobot, mockGithub, mockApi} = require('./utils')
+const {mockRobot, mockGithub} = require('./utils')
 
 const issueCommentCreated = require('./payloads/issueCommentCreated')
 const pullRequestReopened = require('./payloads/pullRequestReopened')
@@ -53,6 +53,7 @@ describe('happy path', () => {
         repo: 'Hello-World'
       })
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
+      expect(github.gitdata.deleteReference).toHaveBeenCalledTimes(1)
     })
   })
 

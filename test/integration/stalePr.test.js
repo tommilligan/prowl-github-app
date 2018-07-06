@@ -2,7 +2,7 @@ const {mockRobot, mockGithub, mockApi} = require('./utils')
 
 const pullRequestReopened = require('./payloads/pullRequestReopened')
 
-let pullRequestUpstream = require('./api/pullRequest')
+const pullRequestUpstream = require('./api/pullRequest')
 pullRequestUpstream.data.head.sha = '0123456789abcdefghijklmnopqrstuvwxyzABCD'
 
 describe('stale PR', () => {
