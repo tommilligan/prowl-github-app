@@ -36,6 +36,11 @@ function mockRobot (github) {
 function mockGithub () {
   // Mocked GitHub APL
   const github = {
+    // pagination helper
+    paginate: async function (fn, cb) {
+      return fn.then(cb)
+    },
+    // data calls
     gitdata: {
       deleteReference: mockApi({
         did: 'delete ref'
