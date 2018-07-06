@@ -83,11 +83,11 @@ const status = async prowl => {
         sort: 'updated',
         order: 'desc'
       }),
-      res => res
+      res => res.data.items
     )
 
     // for each PR
-    const pArray = prs.data.items.map(async item => {
+    const pArray = prs.map(async item => {
       const { data: pr } = await context.github.pullRequests.get(
         context.repo({
           number: item.number
