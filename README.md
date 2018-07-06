@@ -52,16 +52,30 @@ targets:
 
     # When prowl merges
     pounce:
-      # PR reviewers. Only one approval required
+      # PR reviewers. Only one approval from the list is required
+      # default: [] (no reviews required)
       reviewers:
         - tommilligan
         - octocat  
 
-    # Write comments instead of other actions
-    dry_run: true
+      # Delay PR checks to allow CI to start (seconds)
+      # default: 0
+      # accumulator: max value is used
+      check_delay: 90
+      # whether to delete PR branches following a merge
+      # default: true
+      # accumulator: every
+      delete: false
+      # Write comments instead of other actions
+      # default: false
+      # accumulator: some
+      dry_run: true
+      # merge_method (currently merge|squash|rebase) as described here:
+      # https://developer.github.com/v3/pulls/#merge-a-pull-request-merge-button
+      # default: squash
+      # accumulator: error if more than one unique value
+      merge_method: merge
 
-    # Delay PR checks to allow CI to start (seconds)
-    check_delay: 90
 ```
 
 ### Merge strategy
@@ -85,12 +99,25 @@ Details to be confirmed!
 
 ### Private instance
 
+#### Source
+
 Docker images from `master` are automatically uploaded to [Docker Hub](https://hub.docker.com/r/tommilligan/prowl-github-app).
-These can be run in any compatible environment (for ease Heroku, for reliability AWS).
-You will need to set environment variables as described in `.env.example`.
+
+#### Host
+
+Your instance of prowl needs to be accessible at a public URL such as:
+- `https://prowl.your-domain.com/`
+- `https://your-domain.com/prowl`
+
+You will need to set environment variables as described in `.env.example`. In production, you'll also want:
+- `LOG_FORMAT=json` for structured log draining
+- `PRIVATE_KEY=$(cat <your/private-key.pem>)`, [see here](https://probot.github.io/docs/deployment/#deploy-the-app). In development, just add a `*.pem` file to your working directory.
+
+#### GitHub Register
 
 You'll need to set up a private GitHub app to point to this instance, with the following details:
-- Webhook URL: the root URL of the running image (`https://your.domain.here/`)
+- Name: `prowl-<your-custom-name>`
+- Webhook URL: the URL of the running app
 - Permissions:
 
 | Permission             | Access               | Purpose                                 |
@@ -110,7 +137,11 @@ You'll need to set up a private GitHub app to point to this instance, with the f
 | Pull request review    | check PRs after a successful review     |
 | Status                 | check PRs after CI passes               |
 
-Install this app on the repos you want to watch, and you should be good to go!
+#### GitHub Install
+
+Install this app on a repo for prowl to start recieving webhooks for it.
+
+No action will be taken until a valid `.prowl.yml` is found in the repository.
 
 
 ## Development
@@ -120,6 +151,10 @@ yarn install
 yarn dev
 # and localtunnel to your machine
 ```
+
+### Deployment
+
+Prowl is currently deployed to a Heroku free tier web dyno from `master`
 
 ### Design
 

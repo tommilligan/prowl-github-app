@@ -1,0 +1,16 @@
+version: '0.1.0'
+
+# dogfood all the way
+# https://en.wikipedia.org/wiki/Eating_your_own_dog_food
+targets:
+  - id: catchall
+    stalk:
+      paths:
+        - "**/*"
+      base: master
+    pounce:
+      check_delay: 10
+      delete: true
+      merge_method: merge
+      reviewers: []
+
