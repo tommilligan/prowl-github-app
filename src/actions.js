@@ -14,6 +14,13 @@ const commentBodies = require('./commentBodies')
 
 // Dry actions
 
+/**
+ * Note that no config is required to post a comment.
+ * This is **critical**, as it provides a way for us to
+ * expose errors with configuration back to the end user.
+ * @param {*} prowl
+ * @param {*} body
+ */
 async function prComment (prowl, body) {
   const { context, pr } = prowl
   const { number } = pr
@@ -68,14 +75,14 @@ async function prDelete (prowl) {
 }
 
 async function prMerge (prowl) {
-  const { context, pr } = prowl
+  const { context, pr, config } = prowl
 
   const message = `merged PR ${pr.number}`
   const merge = context.repo({
     number: pr.number,
     commit_title: `${pr.title} (#${pr.number})`,
     sha: pr.head.sha,
-    merge_method: 'squash'
+    merge_method: config.mergeMethod
   })
 
   const result = await wetRun(
@@ -88,7 +95,9 @@ async function prMerge (prowl) {
 
   if (result && result.data && result.data.merged) {
     context.log.info(`${pr.url}: merge successful`)
-    await prDelete(prowl)
+    if (config.delete) {
+      await prDelete(prowl)
+    }
   } else {
     context.log.warn(`${pr.url}: merge failed`)
     context.log.warn(result)

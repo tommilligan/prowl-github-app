@@ -52,16 +52,30 @@ targets:
 
     # When prowl merges
     pounce:
-      # PR reviewers. Only one approval required
+      # PR reviewers. Only one approval from the list is required
+      # default: [] (no reviews required)
       reviewers:
         - tommilligan
         - octocat  
 
-    # Write comments instead of other actions
-    dry_run: true
+      # Delay PR checks to allow CI to start (seconds)
+      # default: 0
+      # accumulator: max value is used
+      check_delay: 90
+      # whether to delete PR branches following a merge
+      # default: true
+      # accumulator: every
+      delete: false
+      # Write comments instead of other actions
+      # default: false
+      # accumulator: some
+      dry_run: true
+      # merge_method (currently merge|squash|rebase) as described here:
+      # https://developer.github.com/v3/pulls/#merge-a-pull-request-merge-button
+      # default: squash
+      # accumulator: error if more than one unique value
+      merge_method: merge
 
-    # Delay PR checks to allow CI to start (seconds)
-    check_delay: 90
 ```
 
 ### Merge strategy

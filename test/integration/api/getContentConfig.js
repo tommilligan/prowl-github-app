@@ -3,14 +3,10 @@ targets:
 
   # Each type of PR has a seperate specification
   - id: catchall
-    # Just comment on the PR instead of merging
-    dry_run: false
-    # PRs we are interested in
     stalk:
       paths:
         - "**/*"
       base: master
-    # Conditions to be met
     pounce:
       reviewers: []
 
