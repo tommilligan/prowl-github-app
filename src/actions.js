@@ -8,7 +8,7 @@
  * If config.dryRun is true, other actions will be
  * replaced with comments.
  */
-const url = require('url')
+const urlJoin = require('url-join')
 
 const commentBodies = require('./commentBodies')
 
@@ -37,7 +37,7 @@ async function wetRun (prowl, action, message) {
     return action()
   } else {
     const payload = {
-      configUrl: url.resolve(pr.base.repo.html_url, 'blob/master/.prowl.yml'),
+      configUrl: urlJoin(pr.base.repo.html_url, 'blob/master/.prowl.yml'),
       prUrl: pr.url,
       time: new Date().toISOString(),
       message
