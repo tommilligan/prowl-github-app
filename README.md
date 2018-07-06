@@ -138,6 +138,10 @@ yarn dev
 # and localtunnel to your machine
 ```
 
+### Deployment
+
+Prowl is currently deployed to a Heroku free tier web dyno from `master`
+
 ### Design
 
 ```
