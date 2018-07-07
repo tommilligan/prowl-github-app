@@ -10,7 +10,7 @@ module.exports = robot => {
 
   // log all events we hear
   robot.on(`*`, async context => {
-    return context.log(`event: ${context.event}`)
+    return context.log(`event: ${context.event.event}`)
   })
 
   // event specific listeners
