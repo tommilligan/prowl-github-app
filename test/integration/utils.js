@@ -1,5 +1,4 @@
-
-const { createRobot } = require('probot')
+const { Application } = require('probot')
 const app = require('../../src')
 
 const getCombinedStatusForRef = require('./api/getCombinedStatusForRef')
@@ -22,8 +21,8 @@ function mockApi (content) {
  * Create a mock probot app
  */
 function mockRobot (github) {
-  const robot = createRobot()
-  app(robot)
+  const robot = new Application()
+  robot.load(app)
   // Passes the mocked out GitHub API into out robot instance
   robot.auth = () => Promise.resolve(github)
   return robot
