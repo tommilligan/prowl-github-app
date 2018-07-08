@@ -96,7 +96,6 @@ async function calculatePRConfig (prowl, config) {
  */
 module.exports = async (fn, prowl, ...args) => {
   const { context, pr } = prowl
-  context.log.debug('fetching config')
 
   // Only get prowl config from default branch
   const fileref = context.repo({ path: '.prowl.yml' })
@@ -104,26 +103,26 @@ module.exports = async (fn, prowl, ...args) => {
   const { data: configFile } = result
 
   if (configFile.type !== 'file') {
-    context.log.warn(`${pr.url}: No .prowl.yml found`)
+    prowl.log.warn(`No .prowl.yml found`)
   } else {
     try {
-      context.log.debug('reading config')
+      prowl.log.debug('reading config')
 
       const buf = Buffer.from(configFile.content, configFile.encoding)
       const config = yaml.safeLoad(buf.toString('utf8'))
       const prConfig = await calculatePRConfig(prowl, config)
 
-      context.log.info(`${pr.url}: moving to logic`)
+      prowl.log.info(`Moving to logic`)
       return fn(
         {
           ...prowl,
-          config: prConfig
+          config: prConfig,
         },
         ...args
       )
     } catch (e) {
-      context.log.warn(e)
-      context.log.warn(`${pr.url}: Error loading prowl config`)
+      prowl.log.warn(e)
+      prowl.log.warn(`Error loading prowl config`)
       actions.prComment(prowl, commentBodies.error({
         event: context.event,
         pr: pr.url,
