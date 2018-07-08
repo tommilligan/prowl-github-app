@@ -51,18 +51,25 @@ const prPounceStatus = async prowl => {
   })
 
   // PR reviews
+  // get from API
   const prReviews = await context.github.paginate(
     context.github.pullRequests.getReviews(
       context.repo({ number: pr.number, per_page: 100 })
     ),
     res => res.data
   )
-  const approvedReviewers = prReviews
+  // filter to approved only
+  let approvedReviewers = prReviews
     .filter(review => {
       const { commit_id: commitId, state } = review
       return commitId === pr.head.sha && state === 'APPROVED'
     })
     .map(review => review.user.login)
+  // add author as a reviewer if author_implicit_reviewer is set
+  if (config.author_implicit_reviewer) {
+    approvedReviewers.push(pr.user.login)
+  }
+  // check this generated list against configuration
   const approved = config.reviewerGroups.every(reviewerGroup => {
     return reviewerGroup.some(reviewer => {
       return approvedReviewers.includes(reviewer)

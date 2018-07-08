@@ -58,9 +58,13 @@ targets:
         - tommilligan
         - octocat  
 
+      # Treat the author of the PR as an approving review
+      # default: false
+      # accumulator: every
+      author_implicit_reviewer: true
       # Delay PR checks to allow CI to start (seconds)
-      # default: 0
-      # accumulator: max value is used
+      # default: 5
+      # accumulator: max
       check_delay: 90
       # whether to delete PR branches following a merge
       # default: true

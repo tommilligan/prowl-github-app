@@ -35,15 +35,19 @@ function summariseMergeMethod (targets) {
  */
 function summariseTargets (targets) {
   return {
-    checkDelay: (Math.max(...targets.map(target => target.pounce.check_delay || 0)) || 0) * 1000,
-    delete: targets.every(target => target.pounce.delete || true),
-    dryRun: targets.some(target => target.pounce.dry_run || false),
+    author_implicit_reviewer: targets.every(target => target.pounce.author_implicit_reviewer),
+    checkDelay: Math.max(...targets.map(target => {
+      const { check_delay: delay } = target.pounce
+      return (delay === undefined) ? 5 : delay
+    })) * 1000,
+    delete: targets.every(target => target.pounce.delete !== false),
+    dryRun: targets.some(target => target.pounce.dry_run),
     ids: targets.map(target => target.id),
     mergeMethod: summariseMergeMethod(targets),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
       .filter(reviewers => {
-        return reviewers && reviewers.length > 1
+        return reviewers && reviewers.length > 0
       }),
     stalk: targets.length > 0
   }
