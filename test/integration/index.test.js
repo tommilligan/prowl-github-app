@@ -1,6 +1,7 @@
 const {mockRobot, mockGithub} = require('./utils')
 
 const issueCommentCreated = require('./payloads/issueCommentCreated')
+const pullRequestReview = require('./payloads/pullRequestReview')
 const pullRequestReopened = require('./payloads/pullRequestReopened')
 const statusSuccess = require('./payloads/statusSuccess')
 
@@ -27,6 +28,8 @@ describe('happy path', () => {
         owner: 'tommilligan',
         repo: 'prowl-target-stage'
       })
+      // once for initial data pull, once for recheck
+      expect(github.pullRequests.get).toHaveBeenCalledTimes(2)
       expect(github.pullRequests.merge).toHaveBeenCalledWith({
         commit_title: 'Pr 5 (#5)',
         merge_method: 'squash',
@@ -52,8 +55,19 @@ describe('happy path', () => {
         owner: 'Codertocat',
         repo: 'Hello-World'
       })
+      // only called once as we get initial data from webhook
+      expect(github.pullRequests.get).toHaveBeenCalledTimes(1)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
       expect(github.gitdata.deleteReference).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('pr review', () => {
+    it('checks pr with inline data', async () => {
+      await robot.receive(pullRequestReview)
+      expect(github.search.issues).toHaveBeenCalledTimes(0)
+      expect(github.pullRequests.get).toHaveBeenCalledTimes(1)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
     })
   })
 

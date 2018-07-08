@@ -47,16 +47,14 @@ const issueComment = async prowl => {
 
 const pullRequestReview = async prowl => {
   const { context } = prowl
-  const { pull_request: pullRequest, review } = context.payload
+  const { pull_request: pr, review } = context.payload
 
-  if (review.state === 'approved' && pullRequest.state === 'open') {
-    // if this review could trigger a merge
-    // get the current pr
-    const { data: pr } = await context.github.pullRequests.get(
-      context.repo({
-        number: pullRequest.number
-      })
-    )
+  if (
+    review.state === 'approved' &&
+    pr.state === 'open' &&
+    // review is at HEAD of the PR
+    review.commit_id === pr.head.sha
+  ) {
     // setup logger
     const prowlWithLog = withLog({
       ...prowl,
