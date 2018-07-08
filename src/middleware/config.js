@@ -78,8 +78,8 @@ async function calculatePRConfig (prowl, config) {
         dot: true
       })
     })
-  context.log.info(
-    `${pr.url}: matches targets ${JSON.stringify(
+  prowl.log.info(
+    `matches targets ${JSON.stringify(
       targetsMatched.map(t => t.id)
     )}`
   )
@@ -116,7 +116,7 @@ module.exports = async (fn, prowl, ...args) => {
       return fn(
         {
           ...prowl,
-          config: prConfig,
+          config: prConfig
         },
         ...args
       )
