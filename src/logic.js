@@ -81,26 +81,25 @@ const prPounceStatus = async prowl => {
 }
 
 const conditionsCheck = (prowl, conditions) => {
-  const {context, pr} = prowl
-  context.log.debug(`${pr.url}: checking conditions ${JSON.stringify(conditions)}`)
+  prowl.log.debug(`checking conditions ${JSON.stringify(conditions)}`)
   return conditions.every(condition => condition.pass)
 }
 
 const prMergeTry = async prowl => {
-  const { context, pr, config } = prowl
+  const { config } = prowl
   const { checkDelay, stalk } = config
 
   if (!stalk) {
     return null
   } else {
-    context.log.info(`${pr.url}: delaying check for ${checkDelay}ms`)
+    prowl.log.info(`delaying check for ${checkDelay}ms`)
     await utils.sleep(checkDelay)
 
     const conditions = await prPounceStatus(prowl)
     const prReady = conditionsCheck(prowl, conditions)
 
     if (prReady) {
-      context.log.info(`${pr.url}: ready for merge`)
+      prowl.log.info(`ready for merge`)
       // const comment = context.repo({
       //   number: pr.number,
       //   body: commentBodies.merge(conditions)
@@ -108,7 +107,7 @@ const prMergeTry = async prowl => {
       // context.github.issues.createComment(comment);
       return actions.prMerge(prowl)
     } else {
-      context.log.info(`${pr.url}: not ready for merge`)
+      prowl.log.info(`not ready for merge`)
     }
   }
 }

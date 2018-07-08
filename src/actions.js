@@ -25,7 +25,7 @@ async function prComment (prowl, body) {
   const { context, pr } = prowl
   const { number } = pr
 
-  context.log.info(`${pr.url}: commenting '${body.slice(0, 16)}...'`)
+  prowl.log.info(`commenting '${body.slice(0, 16)}...'`)
   return context.github.issues.createComment(
     context.repo({
       number,
@@ -38,9 +38,9 @@ async function prComment (prowl, body) {
  * If we're not in dryRun, call action. Otherwise, comment message.
  */
 async function wetRun (prowl, action, message) {
-  const { context, pr } = prowl
+  const { pr } = prowl
   if (!prowl.config.dryRun) {
-    context.log.info(`${pr.url}: ${message}`)
+    prowl.log.info(`${message}`)
     return action()
   } else {
     const payload = {
@@ -94,13 +94,13 @@ async function prMerge (prowl) {
   )
 
   if (result && result.data && result.data.merged) {
-    context.log.info(`${pr.url}: merge successful`)
+    prowl.log.debug(`merge successful`)
     if (config.delete) {
       await prDelete(prowl)
     }
   } else {
-    context.log.warn(`${pr.url}: merge failed`)
-    context.log.warn(result)
+    prowl.log.warn(`merge failed`)
+    prowl.log.warn(result)
   }
 }
 

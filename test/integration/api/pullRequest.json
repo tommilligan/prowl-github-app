@@ -16,6 +16,12 @@
       "sha": "ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72"
     },
     "base": {
+      "repo": {
+        "owner": {
+          "login": "tommilligan"
+        },
+        "name": "prowl-target-stage"
+      },
       "label": "tommilligan:master",
       "ref": "master",
       "sha": "cb3d655bbba53938cea23bf9cc4366e4182fa858"

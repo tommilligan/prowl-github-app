@@ -10,6 +10,7 @@
  */
 
 const withConfig = require('./middleware/config')
+const withLog = require('./middleware/log')
 const logic = require('./logic')
 
 const issueComment = async prowl => {
@@ -28,14 +29,16 @@ const issueComment = async prowl => {
       const { data: pr } = await context.github.pullRequests.get(
         context.issue()
       )
+      // setup logger
+      const prowlWithLog = withLog({
+        ...prowl,
+        pr
+      })
+      prowlWithLog.log.info(`Command: ${comment.body}`)
       // and forward for action
-      context.log.info(`${pr.url}: command ${comment.body}`)
       return withConfig(
         logic.prowlCommand,
-        {
-          ...prowl,
-          pr
-        },
+        prowlWithLog,
         subcommand
       )
     }
@@ -47,13 +50,20 @@ const pullRequestReview = async prowl => {
   const { pull_request: pullRequest, review } = context.payload
 
   if (review.state === 'approved' && pullRequest.state === 'open') {
+    // if this review could trigger a merge
+    // get the current pr
     const { data: pr } = await context.github.pullRequests.get(
       context.repo({
         number: pullRequest.number
       })
     )
-    context.log.info(`${pr.url}: ${review.user.login} ${review.state}`)
-    return withConfig(logic.prMergeTry, { ...prowl, pr })
+    // setup logger
+    const prowlWithLog = withLog({
+      ...prowl,
+      pr
+    })
+    prowlWithLog.log.info(`Review: ${review.user.login} ${review.state}`)
+    return withConfig(logic.prMergeTry, prowlWithLog)
   }
 }
 
@@ -62,9 +72,15 @@ const pullRequest = async prowl => {
   const { pull_request: pr, action } = context.payload
 
   if (pr.state === 'open') {
-    context.log.info(`${pr.url}: ${action} ${pr.state}`)
+    // if we need to recheck a pr
+    // setup logger
+    const prowlWithLog = withLog({
+      ...prowl,
+      pr
+    })
+    prowlWithLog.log.info(`PR State: ${action} ${pr.state}`)
 
-    return withConfig(logic.prMergeTry, { ...prowl, pr })
+    return withConfig(logic.prMergeTry, prowlWithLog)
   }
 }
 
@@ -96,10 +112,15 @@ const status = async prowl => {
 
       // action if our commit is the HEAD
       if (sha === pr.head.sha) {
-        context.log.info(
-          `${pr.url}: HEAD (${sha.slice(0, 7)}) status ${state}`
+        // setup logger
+        const prowlWithLog = withLog({
+          ...prowl,
+          pr
+        })
+        prowlWithLog.log.info(
+          `HEAD: ${sha.slice(0, 7)} ${state}`
         )
-        return withConfig(logic.prMergeTry, { ...prowl, pr })
+        return withConfig(logic.prMergeTry, prowlWithLog)
       }
     })
     // wait for our async array for testing purposes
