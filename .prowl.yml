@@ -9,8 +9,10 @@ targets:
         - "**/*"
       base: master
     pounce:
+      author_implicit_reviewer: true
       check_delay: 10
       delete: true
       merge_method: merge
-      reviewers: []
+      reviewers:
+        - tommilligan
 

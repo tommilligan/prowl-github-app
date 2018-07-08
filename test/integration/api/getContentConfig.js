@@ -8,6 +8,7 @@ targets:
         - "**/*"
       base: master
     pounce:
+      check_delay: 0
       reviewers: []
 
   - id: markdown
@@ -16,6 +17,7 @@ targets:
         - "**/*.md"
       base: master
     pounce:
+      check_delay: 0
       reviewers:
         - tommilligan
         - tommilligan-plutoflume
