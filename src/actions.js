@@ -94,7 +94,7 @@ async function prMerge (prowl) {
   )
 
   if (result && result.data && result.data.merged) {
-    prowl.log.info(`merge successful`)
+    prowl.log.debug(`merge successful`)
     if (config.delete) {
       await prDelete(prowl)
     }
