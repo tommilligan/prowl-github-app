@@ -10,7 +10,8 @@ docker tag app tommilligan/prowl-github-app
 docker push tommilligan/prowl-github-app
 
 # Deploy to Heroku
-heroku update
+curl https://cli-assets.heroku.com/install.sh | sh
+heroku --version
 heroku container:login
 docker tag app registry.heroku.com/prowl-github-app/web
 docker push registry.heroku.com/prowl-github-app/web
