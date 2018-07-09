@@ -2,9 +2,10 @@
 set -ev
 
 # Version tag has no 'v' prefix on docker
-VERSION="printf \"${TRAVIS_TAG}\" | sed 's/^v//'"
+VERSION=$(printf ${TRAVIS_TAG} | sed 's/^v//')
 IMAGE_TAG="tommilligan/prowl-github-app:${VERSION}"
 
+echo "$IMAGE_TAG"
 # Build image
 docker build -t "${IMAGE_TAG}" .
 
