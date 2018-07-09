@@ -2,7 +2,7 @@
 set -ev
 
 # Version tag has no 'v' prefix on docker
-VERSION="echo ${TRAVIS_TAG} | sed 's/^v//'"
+VERSION="printf \"${TRAVIS_TAG}\" | sed 's/^v//'"
 IMAGE_TAG="tommilligan/prowl-github-app:${VERSION}"
 
 # Build image
