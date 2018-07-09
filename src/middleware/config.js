@@ -36,6 +36,7 @@ function summariseMergeMethod (targets) {
 function summariseTargets (targets) {
   return {
     author_implicit_reviewer: targets.every(target => target.pounce.author_implicit_reviewer),
+    auto_pounce: targets.every(target => target.pounce.auto_pounce),
     checkDelay: Math.max(...targets.map(target => {
       const { check_delay: delay } = target.pounce
       return (delay === undefined) ? 5 : delay

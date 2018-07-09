@@ -92,13 +92,22 @@ const conditionsCheck = (prowl, conditions) => {
   return conditions.every(condition => condition.pass)
 }
 
-const prMergeTry = async prowl => {
+/**
+ * Try to merge the given PR. If success, null will be returned.
+ * If failure, an array of failed conditions will be returned
+ * @param {*} prowl
+ * @param {boolean} auto If this is a manual merge command
+ */
+const prMergeTry = async (prowl, command = false) => {
   const { config } = prowl
   const { checkDelay, stalk } = config
 
-  if (!stalk) {
-    return null
-  } else {
+  if (
+    // There are applicable rules for this PR
+    stalk &&
+    // We were commanded or auto_pounce is enabled
+    (command || config.auto_pounce)
+  ) {
     prowl.log.info(`delaying check for ${checkDelay}ms`)
     await utils.sleep(checkDelay)
 
@@ -107,14 +116,13 @@ const prMergeTry = async prowl => {
 
     if (prReady) {
       prowl.log.info(`ready for merge`)
-      // const comment = context.repo({
-      //   number: pr.number,
-      //   body: commentBodies.merge(conditions)
-      // });
-      // context.github.issues.createComment(comment);
-      return actions.prMerge(prowl)
+      await actions.prMerge(prowl)
+      return null
     } else {
       prowl.log.info(`not ready for merge`)
+      const failedConditions = conditions
+        .filter(condition => !condition.pass)
+      return failedConditions
     }
   }
 }
@@ -131,6 +139,13 @@ const prowlCommand = async (prowl, command) => {
     }
     case 'id': {
       return actions.prComment(prowl, commentBodies.id(process.env.APP_ID))
+    }
+    case 'merge': {
+      const failedConditions = await prMergeTry(prowl, true)
+      if (failedConditions) {
+        await actions.prComment(prowl, commentBodies.mergeUnready(failedConditions))
+      }
+      return null
     }
     default: {
       return null
