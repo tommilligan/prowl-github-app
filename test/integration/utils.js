@@ -57,7 +57,7 @@ function mockGithub () {
       merge: mockApi(merge)
     },
     repos: {
-      getContent: mockApi(getContentConfig),
+      getContent: mockApi(getContentConfig()),
       getCombinedStatusForRef: mockApi(getCombinedStatusForRef)
     },
     search: {
