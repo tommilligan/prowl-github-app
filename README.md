@@ -58,6 +58,10 @@ targets:
         - tommilligan
         - octocat  
 
+      # Automatically merge the PR when all checks have passed, without a merge command
+      # default: false
+      # accumulator: every
+      auto_pounce: false
       # Treat the author of the PR as an approving review
       # default: false
       # accumulator: every
