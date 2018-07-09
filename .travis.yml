@@ -13,7 +13,9 @@ script:
 after_success:
   - |
     if [[ ( $TRAVIS_BRANCH == "master" ) && ( $TRAVIS_PULL_REQUEST == "false" ) ]]; then
-      ./deploy.sh || exit 1
+      ./scripts/deploy-master.sh || exit 1
+    elif [[ -z "${TRAVIS_TAG}" ]]; then
+      ./scripts/deploy-tag.sh || exit 1
     fi
 notifications:
   email: false
