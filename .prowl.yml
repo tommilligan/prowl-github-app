@@ -9,6 +9,7 @@ targets:
         - "**/*"
       base: master
     pounce:
+      auto_pounce: true
       author_implicit_reviewer: true
       check_delay: 10
       delete: true
