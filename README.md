@@ -59,13 +59,15 @@ targets:
         - octocat  
 
       # action (currently merge|status)
+      # if set to 'status', set this as a required status check on your protected branch
+      # https://help.github.com/articles/about-required-status-checks/
       # default: merge
       # accumulator: error if more than one unique value
       action: status
       # Automatically merge the PR when all checks have passed, without a merge command
       # default: false
       # accumulator: every
-      auto_pounce: false
+      auto_pounce: true
       # Treat the author of the PR as an approving review
       # default: false
       # accumulator: every

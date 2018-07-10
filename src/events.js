@@ -87,7 +87,7 @@ const status = async prowl => {
   const { state, sha, repository } = context.payload
   const repo = repository.full_name
 
-  if (state === 'success') {
+  if (state === 'success' && !context.payload.context.startsWith('prowl')) {
     // if the status update was a success
     // search for PRs containing the commit
     const q = `${sha} repo:${repo} type:pr`
