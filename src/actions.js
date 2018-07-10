@@ -56,6 +56,26 @@ async function wetRun (prowl, action, message) {
 
 // Wet actions
 
+async function prStatus (prowl) {
+  const { context, pr } = prowl
+
+  const message = `added a success status to PR ${pr.number}`
+  return wetRun(
+    prowl,
+    async function () {
+      return context.github.repos.createStatus(
+        context.repo({
+          sha: pr.head.sha,
+          state: 'success',
+          description: 'Prowl approves this PR for merge',
+          context: 'prowl/merge'
+        })
+      )
+    },
+    message
+  )
+}
+
 async function prDelete (prowl) {
   const { context, pr } = prowl
   const { ref } = pr.head
@@ -85,23 +105,25 @@ async function prMerge (prowl) {
     merge_method: config.mergeMethod
   })
 
-  const result = await wetRun(
-    prowl,
-    async function () {
-      return context.github.pullRequests.merge(merge)
-    },
-    message
-  )
+  // TODO HACK split this out as a seperate config thing
+  await prStatus(prowl)
+  // const result = await wetRun(
+  //   prowl,
+  //   async function () {
+  //     return context.github.pullRequests.merge(merge)
+  //   },
+  //   message
+  // )
 
-  if (result && result.data && result.data.merged) {
-    prowl.log.debug(`merge successful`)
-    if (config.delete) {
-      await prDelete(prowl)
-    }
-  } else {
-    prowl.log.warn(`merge failed`)
-    prowl.log.warn(result)
-  }
+  // if (result && result.data && result.data.merged) {
+  //   prowl.log.debug(`merge successful`)
+  //   if (config.delete) {
+  //     await prDelete(prowl)
+  //   }
+  // } else {
+  //   prowl.log.warn(`merge failed`)
+  //   prowl.log.warn(result)
+  // }
 }
 
 module.exports = {
