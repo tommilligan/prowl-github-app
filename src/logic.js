@@ -116,8 +116,19 @@ const prMergeTry = async (prowl, command = false) => {
 
     if (prReady) {
       prowl.log.info(`ready for merge`)
-      await actions.prMerge(prowl)
-      return null
+      switch (config.action) {
+        case 'merge': {
+          await actions.prMerge(prowl)
+          break
+        }
+        case 'status': {
+          await actions.prStatus(prowl)
+          break
+        }
+        default: {
+          return null
+        }
+      }
     } else {
       prowl.log.info(`not ready for merge`)
       const failedConditions = conditions

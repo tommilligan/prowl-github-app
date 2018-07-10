@@ -1,27 +1,14 @@
 const defaultConfig = `
-_test_defaults: &test-defaults
-  auto_pounce: true
-  check_delay: 0
-
+version: '0.1.0'
 targets:
-
-  # Each type of PR has a seperate specification
-  - id: catchall
-    stalk:
-      paths:
-        - "**/*"
-      base: master
-    pounce:
-      <<: *test-defaults
-      reviewers: []
-
   - id: markdown
     stalk:
       paths:
         - "**/*.md"
       base: master
     pounce:
-      <<: *test-defaults
+      auto_pounce: true
+      check_delay: 0
       reviewers:
         - tommilligan
         - tommilligan-plutoflume

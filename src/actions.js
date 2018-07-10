@@ -56,12 +56,32 @@ async function wetRun (prowl, action, message) {
 
 // Wet actions
 
+async function prStatus (prowl) {
+  const { context, pr } = prowl
+
+  const message = `add success status to PR ${pr.number}`
+  return wetRun(
+    prowl,
+    async function () {
+      return context.github.repos.createStatus(
+        context.repo({
+          sha: pr.head.sha,
+          state: 'success',
+          description: 'Prowl approves this PR for merge',
+          context: 'prowl/merge'
+        })
+      )
+    },
+    message
+  )
+}
+
 async function prDelete (prowl) {
   const { context, pr } = prowl
   const { ref } = pr.head
 
   const qualifiedRef = `heads/${ref}`
-  const message = `deleted ref ${ref}`
+  const message = `delete ref ${ref}`
 
   return wetRun(
     prowl,
@@ -77,7 +97,7 @@ async function prDelete (prowl) {
 async function prMerge (prowl) {
   const { context, pr, config } = prowl
 
-  const message = `merged PR ${pr.number}`
+  const message = `merge PR ${pr.number}`
   const merge = context.repo({
     number: pr.number,
     commit_title: `${pr.title} (#${pr.number})`,
@@ -107,5 +127,6 @@ async function prMerge (prowl) {
 module.exports = {
   prComment,
   prDelete,
-  prMerge
+  prMerge,
+  prStatus
 }
