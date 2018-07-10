@@ -10,7 +10,7 @@ ${jsonBlock(o)}`
 const config = o => commentWithJSON(`Config for this PR:`, o)
 const dryRun = payload =>
   commentWithJSON(
-    `If this wasn't a [dry run](${payload.configUrl}), I would have **${
+    `If this wasn't a [dry run](${payload.configUrl}), I would **${
       payload.message
     }**.`,
     payload

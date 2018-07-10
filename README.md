@@ -58,6 +58,10 @@ targets:
         - tommilligan
         - octocat  
 
+      # action (currently merge|status)
+      # default: merge
+      # accumulator: error if more than one unique value
+      action: status
       # Automatically merge the PR when all checks have passed, without a merge command
       # default: false
       # accumulator: every

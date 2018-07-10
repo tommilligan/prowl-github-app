@@ -59,7 +59,7 @@ async function wetRun (prowl, action, message) {
 async function prStatus (prowl) {
   const { context, pr } = prowl
 
-  const message = `added a success status to PR ${pr.number}`
+  const message = `add success status to PR ${pr.number}`
   return wetRun(
     prowl,
     async function () {
@@ -81,7 +81,7 @@ async function prDelete (prowl) {
   const { ref } = pr.head
 
   const qualifiedRef = `heads/${ref}`
-  const message = `deleted ref ${ref}`
+  const message = `delete ref ${ref}`
 
   return wetRun(
     prowl,
@@ -97,7 +97,7 @@ async function prDelete (prowl) {
 async function prMerge (prowl) {
   const { context, pr, config } = prowl
 
-  const message = `merged PR ${pr.number}`
+  const message = `merge PR ${pr.number}`
   const merge = context.repo({
     number: pr.number,
     commit_title: `${pr.title} (#${pr.number})`,
@@ -105,29 +105,28 @@ async function prMerge (prowl) {
     merge_method: config.mergeMethod
   })
 
-  // TODO HACK split this out as a seperate config thing
-  await prStatus(prowl)
-  // const result = await wetRun(
-  //   prowl,
-  //   async function () {
-  //     return context.github.pullRequests.merge(merge)
-  //   },
-  //   message
-  // )
+  const result = await wetRun(
+    prowl,
+    async function () {
+      return context.github.pullRequests.merge(merge)
+    },
+    message
+  )
 
-  // if (result && result.data && result.data.merged) {
-  //   prowl.log.debug(`merge successful`)
-  //   if (config.delete) {
-  //     await prDelete(prowl)
-  //   }
-  // } else {
-  //   prowl.log.warn(`merge failed`)
-  //   prowl.log.warn(result)
-  // }
+  if (result && result.data && result.data.merged) {
+    prowl.log.debug(`merge successful`)
+    if (config.delete) {
+      await prDelete(prowl)
+    }
+  } else {
+    prowl.log.warn(`merge failed`)
+    prowl.log.warn(result)
+  }
 }
 
 module.exports = {
   prComment,
   prDelete,
-  prMerge
+  prMerge,
+  prStatus
 }

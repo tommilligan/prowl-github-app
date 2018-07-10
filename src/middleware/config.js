@@ -1,4 +1,5 @@
 const yaml = require('js-yaml')
+const get = require('lodash.get')
 const uniq = require('lodash.uniq')
 
 const actions = require('../actions')
@@ -11,20 +12,20 @@ const utils = require('./utils')
  * If more than one method is given, an error will be thrown.
  * @param {} targets
  */
-function summariseMergeMethod (targets) {
-  const mergeMethods = uniq(
+function uniqueConfigValue (targets, k, defaultValue) {
+  const values = uniq(
     targets
-      .map(target => target.pounce.merge_method)
+      .map(target => get(target, k) || defaultValue)
       // filter out falsey values like undefined
-      .filter(m => m)
+      .filter(v => v)
   )
 
-  if (mergeMethods.length === 1) {
-    return mergeMethods[0]
-  } else if (mergeMethods.length === 0) {
-    return 'squash'
+  if (values.length === 1) {
+    return values[0]
+  } else if (values.length === 0) {
+    return defaultValue
   } else {
-    throw new Error(`More than one merge_method was specified: ${mergeMethods}`)
+    throw new Error(`More than one value was specified for ${k}: ${values}`)
   }
 }
 
@@ -35,6 +36,7 @@ function summariseMergeMethod (targets) {
  */
 function summariseTargets (targets) {
   return {
+    action: uniqueConfigValue(targets, 'pounce.action', 'merge'),
     author_implicit_reviewer: targets.every(target => target.pounce.author_implicit_reviewer),
     auto_pounce: targets.every(target => target.pounce.auto_pounce),
     checkDelay: Math.max(...targets.map(target => {
@@ -44,7 +46,7 @@ function summariseTargets (targets) {
     delete: targets.every(target => target.pounce.delete !== false),
     dryRun: targets.some(target => target.pounce.dry_run),
     ids: targets.map(target => target.id),
-    mergeMethod: summariseMergeMethod(targets),
+    mergeMethod: uniqueConfigValue(targets, 'pounce.merge_method', 'squash'),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
       .filter(reviewers => {
