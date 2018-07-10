@@ -5,5 +5,5 @@ RUN apk --no-cache add jq
 
 CMD yarn run --silent start | \
   # Alter log draining for conflicting fields  
-  jq --compact-output --monochrome-output '.timestamp = (.time[0:19] + "Z" | fromdateiso8601) | del(.time)'
+  jq --compact-output --monochrome-output '."@timestamp" = .time | del(.time, .v)'
 
