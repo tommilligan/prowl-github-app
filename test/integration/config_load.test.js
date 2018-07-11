@@ -22,7 +22,7 @@ describe('loading .prowl.yml', () => {
 
   describe('invalid file', () => {
     it('missing file fails silently', async () => {
-      github.repos.getContent = jest.fn().mockRejectedValue("some error getting the prowl yml file")
+      github.repos.getContent = jest.fn().mockRejectedValue('some error getting the prowl yml file')
       robot = mockRobot(github)
       await robot.receive(statusSuccess)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
