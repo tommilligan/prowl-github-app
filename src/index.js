@@ -3,11 +3,11 @@
  * GitHub events trigger prowl events.
  */
 
-const pj = require('../package.json')
 const events = require('./events')
+const utils = require('./utils')
 
 module.exports = robot => {
-  robot.log.info(`App started. v${pj.version} prowling...`)
+  robot.log.info(`App started. v${utils.version} prowling...`)
 
   // log all events we hear
   robot.on(`*`, async context => {

@@ -158,8 +158,11 @@ const prowlCommand = async (prowl, command) => {
       }
       return null
     }
+    case 'version': {
+      return actions.prComment(prowl, commentBodies.version(utils.version))
+    }
     default: {
-      return null
+      throw Error(`Invalid prowl subcommand '${command}'`)
     }
   }
 }
