@@ -79,7 +79,7 @@ describe('happy path', () => {
         owner: 'tommilligan',
         repo: 'prowl-target'
       })
-      expect(github.issues.createComment).toHaveBeenCalled()
+      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
     })
   })
 })

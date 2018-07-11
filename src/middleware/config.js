@@ -3,7 +3,6 @@ const get = require('lodash.get')
 const uniq = require('lodash.uniq')
 
 const actions = require('../actions')
-const commentBodies = require('../commentBodies')
 const utils = require('./utils')
 
 /**
@@ -102,25 +101,36 @@ async function calculatePRConfig (prowl, config) {
  * @param {object} args Additional params for fn
  */
 module.exports = async (fn, prowl, ...args) => {
-  const { context, pr } = prowl
+  const { context } = prowl
 
   // Only get prowl config from default branch
   const fileref = context.repo({ path: '.prowl.yml' })
-  const result = await context.github.repos.getContent(fileref)
-  const { data: configFile } = result
 
-  if (configFile.type !== 'file') {
-    prowl.log.warn(`No .prowl.yml found`)
-  } else {
+  // We don't care about errors here - this app isn't using prowl
+  try {
+    const result = await context.github.repos.getContent(fileref)
+    const { data: configFile } = result
+
+    if (configFile.type !== 'file') {
+      throw Error(`.prowl.yml found, but was not a file`)
+    }
+
+    // Now we care about errors
     try {
       prowl.log.debug('reading config')
 
-      const buf = Buffer.from(configFile.content, configFile.encoding)
-      const config = yaml.safeLoad(buf.toString('utf8'))
-      const prConfig = await calculatePRConfig(prowl, config)
+      let prConfig
+      try {
+        const buf = Buffer.from(configFile.content, configFile.encoding)
+        const config = yaml.safeLoad(buf.toString('utf8'))
+        prConfig = await calculatePRConfig(prowl, config)
+      } catch (e) {
+        prowl.log.warn(e)
+        throw Error('Malformed .prowl.yml configuration file')
+      }
 
       prowl.log.info(`Moving to logic`)
-      return fn(
+      await fn(
         {
           ...prowl,
           config: prConfig
@@ -128,13 +138,10 @@ module.exports = async (fn, prowl, ...args) => {
         ...args
       )
     } catch (e) {
-      prowl.log.warn(e)
-      prowl.log.warn(`Error loading prowl config`)
-      actions.prComment(prowl, commentBodies.error({
-        event: context.event,
-        pr: pr.url,
-        message: e.message
-      }))
+      actions.prError(prowl, e)
     }
+  } catch (e) {
+    prowl.log.info('Prowl not set up correctly')
+    prowl.log.info(e)
   }
 }

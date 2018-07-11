@@ -34,6 +34,16 @@ async function prComment (prowl, body) {
   )
 }
 
+async function prError (prowl, e) {
+  prowl.log.warn(e)
+  prowl.log.warn(`Error loading prowl config`)
+  prComment(prowl, commentBodies.error({
+    event: prowl.context.event.event,
+    pr: prowl.pr.url,
+    message: e.message
+  }))
+}
+
 /**
  * If we're not in dryRun, call action. Otherwise, comment message.
  */
@@ -127,6 +137,7 @@ async function prMerge (prowl) {
 module.exports = {
   prComment,
   prDelete,
+  prError,
   prMerge,
   prStatus
 }

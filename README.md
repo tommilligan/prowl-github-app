@@ -21,10 +21,15 @@ Prowl is a stateless, declarative GitHub bot powered by [Probot](https://github.
 Once installed (see below), prowl will run in the background with no input from you.
 
 If you want to check on what it's thinking, you can summon it in a PR by commenting **exactly**:
-- `prowl config`: show the calculated configuration for this PR
+- `prowl config`: show the internal configuration for this PR
 - `prowl status`: show prowl's evaluation of this PR
+- `prowl merge`: force a recheck of this PR
 
 > Press `Ctrl+Enter` to immediately submit a prowl command
+
+Debugging:
+- `prowl id`: show the GitHub app id of this bot
+- `prowl version`: show the running version of prowl
 
 ### Configuration
 
