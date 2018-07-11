@@ -37,6 +37,9 @@ Prowl looks for `.prowl.yml` in your repo's default branch (usually `master`). N
 
 Prowl can watch multiple PR `targets` . A PR matching `stalk` will be reviwed on each update - when `pounce` if fulfilled, the PR will be merged.
 
+If multiple targets are stalked in a single PR, prowl will combine configurations together using the accumulators mentioned.
+Currently how multiple branches are combined is not configurable.
+
 ```yaml
 
 # Config version
