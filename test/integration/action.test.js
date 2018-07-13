@@ -5,7 +5,6 @@ const {mockRobot, mockGithub, mockApi} = require('./utils')
 const getContentConfig = require('./api/getContentConfig')
 const getReviews = require('./api/getReviews')
 const statusSuccess = require('./payloads/statusSuccess')
-const commandStatus = require('./payloads/issueCommentCreated')
 
 describe('action configuration', () => {
   let robot
@@ -23,7 +22,7 @@ describe('action configuration', () => {
       expect(github.repos.createStatus).toHaveBeenCalledTimes(0)
     })
   })
-  describe('merge', () => {
+  describe('status', () => {
     beforeEach(() => {
       const config = getContentConfig(`
 version: '0.1.0'
@@ -85,18 +84,18 @@ targets:
       })
       expect(github.issues.createComment).toHaveBeenCalledTimes(0)
     })
-    it('command merge (in status mode) triggers comment when not ready', async () => {
-      const reviews = cloneDeep(getReviews)
-      reviews.data[0].state = 'CHANGES_REQUESTED'
-      github.pullRequests.getReviews = mockApi(reviews)
-      robot = mockRobot(github)
+    // it('command merge (in status mode) triggers comment when not ready', async () => {
+    //   const reviews = cloneDeep(getReviews)
+    //   reviews.data[0].state = 'CHANGES_REQUESTED'
+    //   github.pullRequests.getReviews = mockApi(reviews)
+    //   robot = mockRobot(github)
 
-      const commandMod = cloneDeep(commandStatus)
-      commandMod.payload.comment.body = 'prowl merge'
-      await robot.receive(commandMod)
-      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
-      expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
-      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
-    })
+    //   const commandMod = cloneDeep(commandStatus)
+    //   commandMod.payload.comment.body = 'prowl merge'
+    //   await robot.receive(commandMod)
+    //   expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    //   expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
+    //   expect(github.issues.createComment).toHaveBeenCalledTimes(1)
+    // })
   })
 })
