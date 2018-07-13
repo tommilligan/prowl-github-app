@@ -112,6 +112,19 @@ const prMergeTry = async (prowl, command = false) => {
     // We were commanded or auto_pounce is enabled
     (command || config.auto_pounce)
   ) {
+    // Immediately set pending status
+    switch (config.action) {
+      case 'status': {
+        const status = {
+          state: 'pending',
+          description: 'Prowl is stalking this PR',
+          context: utils.ownContext('merge')
+        }
+        await actions.prStatus(prowl, status)
+        break
+      }
+    }
+
     prowl.log.info(`delaying check for ${checkDelay}ms`)
     await utils.sleep(checkDelay)
 

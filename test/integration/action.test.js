@@ -49,6 +49,7 @@ targets:
       robot = mockRobot(github)
       await robot.receive(statusSuccess)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+      expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
         'description': 'Prowl approves this PR for merge',
@@ -65,6 +66,7 @@ targets:
       robot = mockRobot(github)
       await robot.receive(statusSuccess)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+      expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
         'description': 'Prowl cannot approve this PR yet',
@@ -85,7 +87,7 @@ targets:
       commandMod.payload.comment.body = 'prowl merge'
       await robot.receive(commandMod)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
-      expect(github.repos.createStatus).toHaveBeenCalledTimes(1)
+      expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.issues.createComment).toHaveBeenCalledTimes(1)
     })
   })
