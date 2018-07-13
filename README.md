@@ -92,6 +92,12 @@ targets:
       # default: false
       # accumulator: some
       dry_run: true
+      # PR with any of these lables will immediately fail a merge check
+      # default: none
+      # accumulator: concat
+      not_ready_labels:
+        - WIP
+        - nomerge
       # merge_method (currently merge|squash|rebase) as described here:
       # https://developer.github.com/v3/pulls/#merge-a-pull-request-merge-button
       # default: squash

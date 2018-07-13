@@ -52,7 +52,15 @@ targets:
       expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
-        'description': 'Prowl approves this PR for merge',
+        'description': 'Prowl is stalking this PR...',
+        'owner': 'tommilligan',
+        'repo': 'prowl-target-stage',
+        'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
+        'state': 'pending'
+      })
+      expect(github.repos.createStatus).toHaveBeenCalledWith({
+        'context': 'prowl/merge',
+        'description': 'Ready for merge. `prowl merge` to execute.',
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
@@ -69,7 +77,7 @@ targets:
       expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
-        'description': 'Prowl cannot approve this PR yet',
+        'description': 'Not ready for merge. `prowl status` for details, `prowl poke` to recheck.',
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
