@@ -1,6 +1,5 @@
 const yaml = require('js-yaml')
-const get = require('lodash.get')
-const uniq = require('lodash.uniq')
+const _ = require('lodash')
 
 const actions = require('../actions')
 const utils = require('./utils')
@@ -12,9 +11,9 @@ const utils = require('./utils')
  * @param {} targets
  */
 function uniqueConfigValue (targets, k, defaultValue) {
-  const values = uniq(
+  const values = _.uniq(
     targets
-      .map(target => get(target, k) || defaultValue)
+      .map(target => _.get(target, k) || defaultValue)
       // filter out falsey values like undefined
       .filter(v => v)
   )
@@ -46,6 +45,7 @@ function summariseTargets (targets) {
     dryRun: targets.some(target => target.pounce.dry_run),
     ids: targets.map(target => target.id),
     mergeMethod: uniqueConfigValue(targets, 'pounce.merge_method', 'squash'),
+    not_ready_labels: _.uniq(_.flatMap(targets, target => target.pounce.not_ready_labels)),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
       .filter(reviewers => {

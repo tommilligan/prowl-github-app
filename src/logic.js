@@ -5,6 +5,8 @@
 
 require('dotenv-safe').config()
 
+const _ = require('lodash')
+
 const actions = require('./actions')
 const commentBodies = require('./commentBodies')
 const utils = require('./utils')
@@ -88,6 +90,16 @@ const prPounceStatus = async prowl => {
     }
   })
 
+  // PR labels
+  const notReadyLabels = prCheck.labels
+    .map(label => label.name)
+    .filter(label => _.includes(config.not_ready_labels, label))
+  conditions.push({
+    description: 'PR is not labelled as not ready',
+    pass: notReadyLabels.length < 1,
+    value: notReadyLabels
+  })
+
   return conditions
 }
 
@@ -117,7 +129,7 @@ const prMergeTry = async (prowl, command = false) => {
       case 'status': {
         const status = {
           state: 'pending',
-          description: 'Prowl is stalking this PR',
+          description: 'Prowl is stalking this PR...',
           context: utils.ownContext('merge')
         }
         await actions.prStatus(prowl, status)
@@ -141,7 +153,7 @@ const prMergeTry = async (prowl, command = false) => {
         case 'status': {
           const status = {
             state: 'success',
-            description: 'Prowl approves this PR for merge',
+            description: 'Ready for merge. `prowl merge` to execute.',
             context: utils.ownContext('merge')
           }
           await actions.prStatus(prowl, status)
@@ -154,7 +166,7 @@ const prMergeTry = async (prowl, command = false) => {
         case 'status': {
           const status = {
             state: 'failure',
-            description: 'Prowl cannot approve this PR yet',
+            description: 'Not ready for merge. `prowl status` for details, `prowl poke` to recheck.',
             context: utils.ownContext('merge')
           }
           await actions.prStatus(prowl, status)

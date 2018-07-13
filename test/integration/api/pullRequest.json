@@ -26,6 +26,11 @@
       "ref": "master",
       "sha": "cb3d655bbba53938cea23bf9cc4366e4182fa858"
     },
+    "labels": [
+      {
+        "name": "medium-priority"
+      }
+    ],
     "merged": false,
     "mergeable": true,
     "rebaseable": null,

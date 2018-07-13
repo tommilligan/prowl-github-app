@@ -92,6 +92,12 @@ targets:
       # default: false
       # accumulator: some
       dry_run: true
+      # PR with any of these lables will immediately fail a merge check
+      # default: none
+      # accumulator: concat
+      not_ready_labels:
+        - WIP
+        - nomerge
       # merge_method (currently merge|squash|rebase) as described here:
       # https://developer.github.com/v3/pulls/#merge-a-pull-request-merge-button
       # default: squash
@@ -100,9 +106,11 @@ targets:
 
 ```
 
-### Merge strategy
+### Ignoring PRs
 
-Currently, `prowl` only supports merging by the `squash` strategy. If you'd like other options, please open an issue!
+Prowl will respectfully ignore PRs you have tagged as not ready.
+Make sure you configure `pounce.not_ready_labels` with a list of labels to treat as an immediate fail.
+
 
 ### Multi-target PRs
 

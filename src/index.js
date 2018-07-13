@@ -24,6 +24,8 @@ module.exports = robot => {
   robot.on([
     'pull_request.opened',
     'pull_request.reopened',
+    'pull_request.labeled',
+    'pull_request.unlabeled',
     'pull_request.synchronize'
   ], async context => {
     return events.pullRequest({ robot, context })
