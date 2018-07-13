@@ -21,7 +21,7 @@ const issueComment = async prowl => {
   if (issue.pull_request) {
     // if this is a pull request comment (not an issue)
     // look for a prowl command
-    const args = comment.body.split(' ')
+    const args = comment.body.trim().split(' ')
     const command = args.shift()
     const subcommand = args.shift()
 
@@ -41,7 +41,7 @@ const issueComment = async prowl => {
       return withConfig(
         logic.prowlCommand,
         prowlWithLog,
-        subcommand
+        subcommand.trim()
       )
     }
   }

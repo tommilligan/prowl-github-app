@@ -5,7 +5,6 @@ const {mockRobot, mockGithub, mockApi} = require('./utils')
 const getContentConfig = require('./api/getContentConfig')
 const getReviews = require('./api/getReviews')
 const statusSuccess = require('./payloads/statusSuccess')
-const commandStatus = require('./payloads/issueCommentCreated')
 
 describe('action configuration', () => {
   let robot
@@ -23,7 +22,7 @@ describe('action configuration', () => {
       expect(github.repos.createStatus).toHaveBeenCalledTimes(0)
     })
   })
-  describe('merge', () => {
+  describe('status', () => {
     beforeEach(() => {
       const config = getContentConfig(`
 version: '0.1.0'
@@ -77,7 +76,7 @@ targets:
       expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
-        'description': 'Not ready for merge. `prowl status` for details, `prowl poke` to recheck.',
+        'description': 'Not ready for merge. `prowl status` for details, `prowl touch` to recheck.',
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
@@ -85,18 +84,18 @@ targets:
       })
       expect(github.issues.createComment).toHaveBeenCalledTimes(0)
     })
-    it('command merge (in status mode) triggers comment when not ready', async () => {
-      const reviews = cloneDeep(getReviews)
-      reviews.data[0].state = 'CHANGES_REQUESTED'
-      github.pullRequests.getReviews = mockApi(reviews)
-      robot = mockRobot(github)
+    // it('command merge (in status mode) triggers comment when not ready', async () => {
+    //   const reviews = cloneDeep(getReviews)
+    //   reviews.data[0].state = 'CHANGES_REQUESTED'
+    //   github.pullRequests.getReviews = mockApi(reviews)
+    //   robot = mockRobot(github)
 
-      const commandMod = cloneDeep(commandStatus)
-      commandMod.payload.comment.body = 'prowl merge'
-      await robot.receive(commandMod)
-      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
-      expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
-      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
-    })
+    //   const commandMod = cloneDeep(commandStatus)
+    //   commandMod.payload.comment.body = 'prowl merge'
+    //   await robot.receive(commandMod)
+    //   expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    //   expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
+    //   expect(github.issues.createComment).toHaveBeenCalledTimes(1)
+    // })
   })
 })

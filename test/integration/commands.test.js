@@ -15,13 +15,10 @@ describe('comment commands', () => {
   })
 
   describe('valid commands should all reply with comment', () => {
-    it('status', async () => {
-      await robot.receive(commandStatus)
-      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
-    })
-
     it('config', async () => {
-      await robot.receive(commandStatus)
+      const commandMod = cloneDeep(commandStatus)
+      commandMod.payload.comment.body = 'prowl config'
+      await robot.receive(commandMod)
       expect(github.issues.createComment).toHaveBeenCalledTimes(1)
     })
     it('id', async () => {
@@ -34,7 +31,19 @@ describe('comment commands', () => {
       const commandMod = cloneDeep(commandStatus)
       commandMod.payload.comment.body = 'prowl merge'
       await robot.receive(commandMod)
+      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
+    })
+    it('status', async () => {
+      await robot.receive(commandStatus)
+      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
+      expect(github.pullRequests.get).toHaveBeenCalledTimes(2)
+    })
+    it('touch', async () => {
+      const commandMod = cloneDeep(commandStatus)
+      commandMod.payload.comment.body = 'prowl touch'
+      await robot.receive(commandMod)
       expect(github.issues.createComment).toHaveBeenCalledTimes(0)
+      expect(github.pullRequests.get).toHaveBeenCalledTimes(2)
     })
     it('version', async () => {
       const commandMod = cloneDeep(commandStatus)
