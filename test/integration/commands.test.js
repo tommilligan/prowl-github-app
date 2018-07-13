@@ -32,13 +32,13 @@ describe('comment commands', () => {
     })
     it('merge', async () => {
       const commandMod = cloneDeep(commandStatus)
-      commandMod.payload.comment.body = 'prowl id'
+      commandMod.payload.comment.body = 'prowl merge'
       await robot.receive(commandMod)
-      expect(github.issues.createComment).toHaveBeenCalledTimes(1)
+      expect(github.issues.createComment).toHaveBeenCalledTimes(0)
     })
     it('version', async () => {
       const commandMod = cloneDeep(commandStatus)
-      commandMod.payload.comment.body = 'prowl id'
+      commandMod.payload.comment.body = 'prowl version'
       await robot.receive(commandMod)
       expect(github.issues.createComment).toHaveBeenCalledTimes(1)
     })

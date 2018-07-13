@@ -45,7 +45,6 @@ const prPounceStatus = async prowl => {
     ),
     res => res.data.statuses
   )
-  prowl.log.warn(refStatuses)
   const refStatusSuccess = refStatuses
     .filter(refStatus => !utils.isOwnContext(refStatus.context))
     .every(refStatus => refStatus.state === 'success')
@@ -127,14 +126,30 @@ const prMergeTry = async (prowl, command = false) => {
           break
         }
         case 'status': {
-          await actions.prStatus(prowl)
+          const status = {
+            state: 'success',
+            description: 'Prowl approves this PR for merge',
+            context: utils.ownContext('merge')
+          }
+          await actions.prStatus(prowl, status)
           break
-        }
-        default: {
-          return null
         }
       }
     } else {
+      // Configured action
+      switch (config.action) {
+        case 'status': {
+          const status = {
+            state: 'failure',
+            description: 'Prowl cannot approve this PR yet',
+            context: utils.ownContext('merge')
+          }
+          await actions.prStatus(prowl, status)
+          break
+        }
+      }
+
+      // Always return failed conditions
       prowl.log.info(`not ready for merge`)
       const failedConditions = conditions
         .filter(condition => !condition.pass)

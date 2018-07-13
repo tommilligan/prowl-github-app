@@ -11,7 +11,6 @@
 const urlJoin = require('url-join')
 
 const commentBodies = require('./commentBodies')
-const utils = require('./utils')
 
 // Dry actions
 
@@ -67,19 +66,17 @@ async function wetRun (prowl, action, message) {
 
 // Wet actions
 
-async function prStatus (prowl) {
+async function prStatus (prowl, status) {
   const { context, pr } = prowl
 
-  const message = `add success status to PR ${pr.number}`
+  const message = `set status '${status.context}: ${status.state}'`
   return wetRun(
     prowl,
     async function () {
       return context.github.repos.createStatus(
         context.repo({
-          sha: pr.head.sha,
-          state: 'success',
-          description: 'Prowl approves this PR for merge',
-          context: utils.ownContext('merge')
+          ...status,
+          sha: pr.head.sha
         })
       )
     },
