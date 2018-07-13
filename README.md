@@ -106,9 +106,11 @@ targets:
 
 ```
 
-### Merge strategy
+### Ignoring PRs
 
-Currently, `prowl` only supports merging by the `squash` strategy. If you'd like other options, please open an issue!
+Prowl will respectfully ignore PRs you have tagged as not ready.
+Make sure you configure `pounce.not_ready_labels` with a list of labels to treat as an immediate fail.
+
 
 ### Multi-target PRs
 
