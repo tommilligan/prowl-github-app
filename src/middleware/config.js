@@ -45,7 +45,7 @@ function summariseTargets (targets) {
     dryRun: targets.some(target => target.pounce.dry_run),
     ids: targets.map(target => target.id),
     mergeMethod: uniqueConfigValue(targets, 'pounce.merge_method', 'squash'),
-    not_ready_labels: _.uniq(_.flatMap(targets, target => target.pounce.not_ready_labels)),
+    not_ready_labels: _.uniq(_.flatMap(targets, target => target.pounce.not_ready_labels || [])),
     reviewerGroups: targets
       .map(target => target.pounce.reviewers)
       .filter(reviewers => {
