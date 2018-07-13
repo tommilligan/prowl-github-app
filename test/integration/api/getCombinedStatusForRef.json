@@ -1,5 +1,23 @@
 {
   "data": {
-    "state": "success"
+    "state": "failure",
+    "statuses": [
+      {
+        "state": "success",
+        "description": "Build has completed successfully",
+        "context": "continuous-integration/jenkins",
+        "creator": {
+          "login": "octocat"
+        }
+      },
+      {
+        "state": "failure",
+        "description": "Prowl cannot approve this PR yet",
+        "context": "prowl/merge",
+        "creator": {
+          "login": "octocat"
+        }
+      }
+    ]
   }
 }

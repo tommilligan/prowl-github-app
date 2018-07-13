@@ -39,15 +39,20 @@ const prPounceStatus = async prowl => {
   })
 
   // check commit is success
-  const {
-    data: refStatus
-  } = await context.github.repos.getCombinedStatusForRef(
-    context.repo({ ref: pr.head.sha })
+  const refStatuses = await context.github.paginate(
+    context.github.repos.getCombinedStatusForRef(
+      context.repo({ ref: pr.head.sha })
+    ),
+    res => res.data.statuses
   )
+  prowl.log.warn(refStatuses)
+  const refStatusSuccess = refStatuses
+    .filter(refStatus => !utils.isOwnContext(refStatus.context))
+    .every(refStatus => refStatus.state === 'success')
   conditions.push({
     description: 'Commit status success',
-    pass: refStatus.state === 'success',
-    value: refStatus.state
+    pass: refStatusSuccess,
+    value: refStatusSuccess
   })
 
   // PR reviews
