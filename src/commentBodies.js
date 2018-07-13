@@ -22,7 +22,6 @@ In future, \`${deprecated}\` will **${newAction}**.
 
 ${advice}`
 const error = o => commentWithJSON(`An event was not processed due to the following error:`, o)
-const id = s => `GitHub app id is \`${s}\``
 const mergeUnready = o => commentWithJSON(`This PR is not ready for merge. The following checks failed:`, o)
 const pounceStatus = o => commentWithJSON(`Status of this PR:`, o)
 
@@ -31,7 +30,6 @@ module.exports = {
   deprecation,
   dryRun,
   error,
-  id,
   mergeUnready,
   pounceStatus
 }

@@ -189,7 +189,10 @@ const prowlCommand = async (prowl, command) => {
       return actions.prComment(prowl, commentBodies.pounceStatus(conditions))
     }
     case 'id': {
-      return actions.prComment(prowl, commentBodies.id(process.env.APP_ID))
+      return actions.prComment(
+        prowl,
+        `GitHub app id is \`${process.env.APP_ID}\``
+      )
     }
     case 'merge': {
       return actions.prComment(prowl, commentBodies.deprecation(
@@ -218,10 +221,13 @@ const prowlCommand = async (prowl, command) => {
       return null
     }
     case 'version': {
-      return actions.prComment(prowl, commentBodies.version(utils.version))
+      return actions.prComment(
+        prowl,
+        `Version running is \`${utils.version}\``
+      )
     }
     default: {
-      throw Error(`Invalid prowl subcommand '${command}'`)
+      throw Error(`Invalid prowl subcommand '${utils.command}'`)
     }
   }
 }
