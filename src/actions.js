@@ -11,6 +11,7 @@
 const urlJoin = require('url-join')
 
 const commentBodies = require('./commentBodies')
+const utils = require('./utils')
 
 // Dry actions
 
@@ -78,7 +79,7 @@ async function prStatus (prowl) {
           sha: pr.head.sha,
           state: 'success',
           description: 'Prowl approves this PR for merge',
-          context: 'prowl/merge'
+          context: utils.ownContext('merge')
         })
       )
     },
