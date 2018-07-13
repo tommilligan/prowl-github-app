@@ -77,5 +77,15 @@ describe('PR merge conditions', () => {
       await robot.receive(pullRequestReopened)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
     })
+    it('PR with WIP label', async () => {
+      // Return with a new label
+      const pr = cloneDeep(pullRequest)
+      pr.data.labels[0].name = 'WIP'
+      github.pullRequests.get = mockApi(pr)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
   })
 })

@@ -12,6 +12,8 @@ targets:
       reviewers:
         - tommilligan
         - tommilligan-plutoflume
+      not_ready_labels:
+        - WIP
 `
 
 function encodeToContent (c) {
