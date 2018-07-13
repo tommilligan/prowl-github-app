@@ -77,7 +77,7 @@ targets:
       expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
-        'description': 'Not ready for merge. `prowl status` for details, `prowl poke` to recheck.',
+        'description': 'Not ready for merge. `prowl status` for details, `prowl touch` to recheck.',
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',

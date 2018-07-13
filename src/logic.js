@@ -166,19 +166,14 @@ const prMergeTry = async (prowl, command = false) => {
         case 'status': {
           const status = {
             state: 'failure',
-            description: 'Not ready for merge. `prowl status` for details, `prowl poke` to recheck.',
+            description: 'Not ready for merge. `prowl status` for details, `prowl touch` to recheck.',
             context: utils.ownContext('merge')
           }
           await actions.prStatus(prowl, status)
           break
         }
       }
-
-      // Always return failed conditions
       prowl.log.info(`not ready for merge`)
-      const failedConditions = conditions
-        .filter(condition => !condition.pass)
-      return failedConditions
     }
   }
 }
@@ -186,21 +181,40 @@ const prMergeTry = async (prowl, command = false) => {
 const prowlCommand = async (prowl, command) => {
   const { config } = prowl
   switch (command) {
-    case 'status': {
-      const conditions = await prPounceStatus(prowl)
-      return actions.prComment(prowl, commentBodies.pounceStatus(conditions))
-    }
     case 'config': {
       return actions.prComment(prowl, commentBodies.config(config))
+    }
+    case 'debug': {
+      const conditions = await prPounceStatus(prowl)
+      return actions.prComment(prowl, commentBodies.pounceStatus(conditions))
     }
     case 'id': {
       return actions.prComment(prowl, commentBodies.id(process.env.APP_ID))
     }
     case 'merge': {
-      const failedConditions = await prMergeTry(prowl, true)
-      if (failedConditions) {
+      return actions.prComment(prowl, commentBodies.deprecation(
+        'prowl merge',
+        'will merge the PR without confirmation',
+        'Please use `prowl status` instead.'
+      ))
+    }
+    case 'status': {
+      const conditions = await prPounceStatus(prowl)
+      const failedConditions = conditions
+        .filter(condition => !condition.pass)
+      if (failedConditions.length > 0) {
         await actions.prComment(prowl, commentBodies.mergeUnready(failedConditions))
+      } else {
+        await actions.prComment(
+          prowl,
+          'PR looks ready for merge. Use `prowl touch` to trigger a full check.'
+        )
       }
+      return null
+    }
+    case 'touch': {
+      // act as if we just had another event of some kind
+      await prMergeTry(prowl)
       return null
     }
     case 'version': {
