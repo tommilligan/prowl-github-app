@@ -69,7 +69,8 @@ describe('PR merge conditions', () => {
     it('PR with non success HEAD', async () => {
       // Waiting on CI
       const status = cloneDeep(getCombinedStatusForRef)
-      status.data.state = 'pending'
+      status.data.statuses[0].state = 'pending'
+      status.data.statuses[0].context = 'custom-test-status'
       github.repos.getCombinedStatusForRef = mockApi(status)
       robot = mockRobot(github)
 

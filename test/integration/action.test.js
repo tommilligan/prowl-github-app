@@ -3,7 +3,7 @@ const {mockRobot, mockGithub, mockApi} = require('./utils')
 const getContentConfig = require('./api/getContentConfig')
 const statusSuccess = require('./payloads/statusSuccess')
 
-describe('stale PR', () => {
+describe('action configuration', () => {
   let robot
   let github
 

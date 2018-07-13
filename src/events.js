@@ -9,9 +9,11 @@
  *   - forwarding to a logical handler
  */
 
+const constants = require('./constants')
 const withConfig = require('./middleware/config')
 const withLog = require('./middleware/log')
 const logic = require('./logic')
+const utils = require('./utils')
 
 const issueComment = async prowl => {
   const { context } = prowl
@@ -23,7 +25,7 @@ const issueComment = async prowl => {
     const command = args.shift()
     const subcommand = args.shift()
 
-    if (command === 'prowl' && subcommand) {
+    if (command === constants.APP_NAME && subcommand) {
       // if this is a prowl trigger
       // get the current pr
       const { data: pr } = await context.github.pullRequests.get(
@@ -87,7 +89,7 @@ const status = async prowl => {
   const { state, sha, repository } = context.payload
   const repo = repository.full_name
 
-  if (state === 'success' && !context.payload.context.startsWith('prowl')) {
+  if (state === 'success' && !utils.isOwnContext(context.payload.context)) {
     // if the status update was a success
     // search for PRs containing the commit
     const q = `${sha} repo:${repo} type:pr`
