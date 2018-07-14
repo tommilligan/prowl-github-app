@@ -9,6 +9,7 @@
  * replaced with comments.
  */
 const urlJoin = require('url-join')
+const _ = require('lodash')
 
 const commentBodies = require('./commentBodies')
 
@@ -102,11 +103,52 @@ async function prDelete (prowl) {
   )
 }
 
+function parseClubhouse (prowl) {
+  const { pr } = prowl
+  let m
+
+  // If title looks like a clubhouse branch name
+  m = pr.title.match(/\/(ch\d+)\/(.*)$/)
+  if (m) {
+    // reformat to title with issue tag
+    return `${m[2]} [${m[1]}]`
+  }
+
+  // othersise, search for an issue tag in the branch name
+  m = pr.head.ref.match(/\/(ch\d+)\//)
+  const issueTag = `[${m[0]}]`
+  if (m && _.includes(pr.title, issueTag)) {
+    // and if not already in the title, add it
+    return `${pr.title} ${issueTag}`
+  }
+}
+
+function prCommitMessage (prowl) {
+  const { pr, config } = prowl
+
+  let msg
+  switch (config.commit_message_parser) {
+    case 'clubhouse': {
+      msg = parseClubhouse(prowl)
+      break
+    }
+    default: {
+      msg = pr.title
+    }
+  }
+
+  if (config.commit_message_pr_number) {
+    msg = `${msg} (#${pr.number})`
+  }
+
+  return msg
+}
+
 async function prMerge (prowl) {
   const { context, pr, config } = prowl
 
   const message = `merge PR ${pr.number}`
-  const commitMessage = `${pr.title} (#${pr.number})`
+  const commitMessage = prCommitMessage(prowl)
   const merge = context.repo({
     number: pr.number,
     commit_title: commitMessage,

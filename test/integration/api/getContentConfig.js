@@ -9,6 +9,7 @@ targets:
     pounce:
       auto_pounce: true
       check_delay: 0
+      commit_message_pr_number: true
       reviewers:
         - tommilligan
         - tommilligan-plutoflume

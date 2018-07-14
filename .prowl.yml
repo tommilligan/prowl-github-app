@@ -12,6 +12,7 @@ targets:
       auto_pounce: true
       author_implicit_reviewer: true
       check_delay: 10
+      commit_message_pr_number: true
       delete: true
       merge_method: merge
       reviewers:
