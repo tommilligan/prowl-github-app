@@ -48,7 +48,7 @@ targets:
 
       await robot.receive(statusSuccess)
       expect(github.pullRequests.merge).toHaveBeenCalledWith({
-        commit_title: 'Pr 5 (#5)',
+        commit_title: 'Pr 5',
         merge_method: 'merge',
         number: 5,
         owner: 'tommilligan',

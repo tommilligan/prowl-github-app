@@ -1,4 +1,4 @@
-const cloneDeep = require('lodash.clonedeep')
+const _ = require('lodash')
 
 const {mockRobot, mockGithub, mockApi} = require('./utils')
 
@@ -67,7 +67,7 @@ targets:
       })
     })
     it('triggers status when not ready', async () => {
-      const reviews = cloneDeep(getReviews)
+      const reviews = _.cloneDeep(getReviews)
       reviews.data[0].state = 'CHANGES_REQUESTED'
       github.pullRequests.getReviews = mockApi(reviews)
       robot = mockRobot(github)
@@ -85,12 +85,12 @@ targets:
       expect(github.issues.createComment).toHaveBeenCalledTimes(0)
     })
     // it('command merge (in status mode) triggers comment when not ready', async () => {
-    //   const reviews = cloneDeep(getReviews)
+    //   const reviews = _.cloneDeep(getReviews)
     //   reviews.data[0].state = 'CHANGES_REQUESTED'
     //   github.pullRequests.getReviews = mockApi(reviews)
     //   robot = mockRobot(github)
 
-    //   const commandMod = cloneDeep(commandStatus)
+    //   const commandMod = _.cloneDeep(commandStatus)
     //   commandMod.payload.comment.body = 'prowl merge'
     //   await robot.receive(commandMod)
     //   expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)

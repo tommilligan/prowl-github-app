@@ -88,6 +88,14 @@ targets:
       # default: 5
       # accumulator: max
       check_delay: 90
+      # Adjust commit message automatically
+      # default: null (title of PR)
+      # accumulator: error if more than one unique value
+      commit_message_parser: clubhouse
+      # Append the PR number to the commit message in the format ` (#\d+)`
+      # default: false
+      # accumulator: every
+      commit_message_pr_number: true
       # whether to delete PR branches following a merge
       # default: true
       # accumulator: every

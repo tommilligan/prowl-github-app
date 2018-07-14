@@ -1,4 +1,4 @@
-const cloneDeep = require('lodash.clonedeep')
+const _ = require('lodash')
 
 const {mockRobot, mockGithub} = require('./utils')
 
@@ -21,21 +21,21 @@ describe('stale PR', () => {
     })
     it('failure does not trigger issues search', async () => {
       // Trigger bad event payload
-      const status = cloneDeep(statusSuccess)
+      const status = _.cloneDeep(statusSuccess)
       status.payload.state = 'failure'
       await robot.receive(status)
       expect(github.search.issues).toHaveBeenCalledTimes(0)
     })
     it('pending does not trigger issues search', async () => {
       // Trigger bad event payload
-      const status = cloneDeep(statusSuccess)
+      const status = _.cloneDeep(statusSuccess)
       status.payload.state = 'pending'
       await robot.receive(status)
       expect(github.search.issues).toHaveBeenCalledTimes(0)
     })
     it('prowl/ namespace status does not trigger issues search', async () => {
       // Trigger bad event payload
-      const status = cloneDeep(statusSuccess)
+      const status = _.cloneDeep(statusSuccess)
       status.payload.context = 'prowl/spam'
       await robot.receive(status)
       expect(github.search.issues).toHaveBeenCalledTimes(0)

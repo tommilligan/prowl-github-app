@@ -41,6 +41,8 @@ function summariseTargets (targets) {
       const { check_delay: delay } = target.pounce
       return (delay === undefined) ? 5 : delay
     })) * 1000,
+    commit_message_parser: uniqueConfigValue(targets, 'pounce.commit_message_parser', null),
+    commit_message_pr_number: targets.every(target => target.pounce.commit_message_pr_number),
     delete: targets.every(target => target.pounce.delete !== false),
     dryRun: targets.some(target => target.pounce.dry_run),
     ids: targets.map(target => target.id),
