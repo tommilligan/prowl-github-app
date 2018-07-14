@@ -1,4 +1,4 @@
-const cloneDeep = require('lodash.clonedeep')
+const _ = require('lodash')
 
 const {mockRobot, mockGithub, mockApi} = require('./utils')
 
@@ -28,7 +28,7 @@ describe('PR merge conditions', () => {
   describe('does not merge', () => {
     it('stale PR', async () => {
       // Return a different head SHA
-      const pr = cloneDeep(pullRequest)
+      const pr = _.cloneDeep(pullRequest)
       pr.data.head.sha = '0123456789abcdefghijklmnopqrstuvwxyzABCD'
       github.pullRequests.get = mockApi(pr)
       robot = mockRobot(github)
@@ -38,7 +38,7 @@ describe('PR merge conditions', () => {
     })
     it('unmergeable PR', async () => {
       // Return a different head SHA
-      const pr = cloneDeep(pullRequest)
+      const pr = _.cloneDeep(pullRequest)
       pr.data.mergeable = false
       github.pullRequests.get = mockApi(pr)
       robot = mockRobot(github)
@@ -48,7 +48,7 @@ describe('PR merge conditions', () => {
     })
     it('closed PR', async () => {
       // Return a different head SHA
-      const pr = cloneDeep(pullRequest)
+      const pr = _.cloneDeep(pullRequest)
       pr.data.state = 'closed'
       github.pullRequests.get = mockApi(pr)
       robot = mockRobot(github)
@@ -58,7 +58,7 @@ describe('PR merge conditions', () => {
     })
     it('PR with no approving reviews when required', async () => {
       // Add another review that is not approved
-      const reviews = cloneDeep(getReviews)
+      const reviews = _.cloneDeep(getReviews)
       reviews.data[0].state = 'CHANGES_REQUESTED'
       github.pullRequests.getReviews = mockApi(reviews)
       robot = mockRobot(github)
@@ -68,7 +68,7 @@ describe('PR merge conditions', () => {
     })
     it('PR with non success HEAD', async () => {
       // Waiting on CI
-      const status = cloneDeep(getCombinedStatusForRef)
+      const status = _.cloneDeep(getCombinedStatusForRef)
       status.data.statuses[0].state = 'pending'
       status.data.statuses[0].context = 'custom-test-status'
       github.repos.getCombinedStatusForRef = mockApi(status)
@@ -79,7 +79,7 @@ describe('PR merge conditions', () => {
     })
     it('PR with WIP label', async () => {
       // Return with a new label
-      const pr = cloneDeep(pullRequest)
+      const pr = _.cloneDeep(pullRequest)
       pr.data.labels[0].name = 'WIP'
       github.pullRequests.get = mockApi(pr)
       robot = mockRobot(github)

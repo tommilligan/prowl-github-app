@@ -104,23 +104,28 @@ async function prDelete (prowl) {
 }
 
 function parseClubhouse (prowl) {
-  const { pr } = prowl
+  const { title } = prowl.pr
   let m
 
   // If title looks like a clubhouse branch name
-  m = pr.title.match(/\/(ch\d+)\/(.*)$/)
+  m = title.match(/\/(ch\d+)\/(.*)$/)
   if (m) {
     // reformat to title with issue tag
     return `${m[2]} [${m[1]}]`
   }
 
-  // othersise, search for an issue tag in the branch name
-  m = pr.head.ref.match(/\/(ch\d+)\//)
-  const issueTag = `[${m[0]}]`
-  if (m && _.includes(pr.title, issueTag)) {
+  // otherwise, search for an issue tag in the branch name
+  m = prowl.pr.head.ref.match(/\/(ch\d+)\//)
+  if (m) {
+    const issueTag = `[${m[1]}]`
     // and if not already in the title, add it
-    return `${pr.title} ${issueTag}`
+    if (!_.includes(title, issueTag)) {
+      return `${title} ${issueTag}`
+    }
   }
+
+  // otherwise
+  return title
 }
 
 function prCommitMessage (prowl) {
