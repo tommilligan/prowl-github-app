@@ -106,9 +106,10 @@ async function prMerge (prowl) {
   const { context, pr, config } = prowl
 
   const message = `merge PR ${pr.number}`
+  const commitMessage = `${pr.title} (#${pr.number})`
   const merge = context.repo({
     number: pr.number,
-    commit_title: `${pr.title} (#${pr.number})`,
+    commit_title: commitMessage,
     sha: pr.head.sha,
     merge_method: config.mergeMethod
   })
