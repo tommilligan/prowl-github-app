@@ -135,6 +135,8 @@ See the [examples](examples) directory for more `prowl.yml` ideas.
 
 ## Installation
 
+Please see the [changelog](CHANGELOG.md) when upgrading.
+
 ### Public instance
 
 Details to be confirmed!
