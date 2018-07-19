@@ -57,6 +57,7 @@ targets:
     # What prowl watches
     stalk:
       # PR changed files. Triggers if any path matches any file
+      # prowl uses the minimatch library internally, see below for details
       paths:
         - "src/**/*"
       # PR base branch
@@ -117,6 +118,16 @@ targets:
       merge_method: merge
 
 ```
+
+### File glob/pattern matching
+
+Prowl uses the [minimatch](https://github.com/isaacs/minimatch) library to handle glob-like matching.
+Please [see here](https://github.com/isaacs/minimatch) for a reference of valid patterns. Prowl uses the options `{dot: true}`.
+
+For example:
+- `**/*` matches all files
+- `{foo,bar}/*` matches all immediate children of the `foo` and `bar` directories
+- `!{ignoreme}/**/*` matches all files not in the `ignoreme` directory
 
 ### Ignoring PRs
 
