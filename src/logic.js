@@ -77,7 +77,7 @@ const prPounceStatus = async prowl => {
   }
   // check this generated list against configuration
   const approved = config.reviewerGroups.every(reviewerGroup => {
-    return reviewerGroup.some(reviewer => {
+    return reviewerGroup.reviewers.some(reviewer => {
       return approvedReviewers.includes(reviewer)
     })
   })
