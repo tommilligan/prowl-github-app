@@ -49,9 +49,15 @@ function summariseTargets (targets) {
     mergeMethod: uniqueConfigValue(targets, 'pounce.merge_method', 'squash'),
     not_ready_labels: _.uniq(_.flatMap(targets, target => target.pounce.not_ready_labels || [])),
     reviewerGroups: targets
-      .map(target => target.pounce.reviewers)
-      .filter(reviewers => {
+      .filter(target => {
+        const { reviewers } = target.pounce
         return reviewers && reviewers.length > 0
+      })
+      .map(target => {
+        return {
+          id: target.id,
+          reviewers: target.pounce.reviewers
+        }
       }),
     stalk: targets.length > 0
   }
