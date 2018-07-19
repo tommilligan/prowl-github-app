@@ -22,7 +22,10 @@ In future, \`${deprecated}\` will **${newAction}**.
 
 ${advice}`
 const error = o => commentWithJSON(`An event was not processed due to the following error:`, o)
-const mergeUnready = o => commentWithJSON(`This PR is not ready for merge. The following checks failed:`, o)
+const mergeUnready = conditions => conditions.reduce(
+  (ls, c) => `${ls}\n- ${c.description}`,
+  'This PR is not ready for merge, due to the following reasons:'
+)
 const pounceStatus = o => commentWithJSON(`Status of this PR:`, o)
 
 module.exports = {

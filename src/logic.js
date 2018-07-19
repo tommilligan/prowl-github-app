@@ -23,19 +23,22 @@ const prPounceStatus = async prowl => {
 
   // check HEAD hasn't moved
   conditions.push({
-    description: 'HEAD is fresh',
+    description: 'The HEAD of the PR has changed since this check started',
+    id: 'headFresh',
     pass: prCheck.head.sha === pr.head.sha,
     value: pr.head.sha
   })
   // check PR is mergeable
   conditions.push({
-    description: 'PR is mergeable',
+    description: 'This PR not mergeable - are there conflicts?',
+    id: 'mergeable',
     pass: !!prCheck.mergeable,
     value: prCheck.mergeable
   })
   // check PR is open
   conditions.push({
-    description: 'PR is open',
+    description: 'PR is not open',
+    id: 'open',
     pass: prCheck.state === 'open',
     value: prCheck.state
   })
@@ -51,7 +54,8 @@ const prPounceStatus = async prowl => {
     .filter(refStatus => !utils.isOwnContext(refStatus.context))
     .every(refStatus => refStatus.state === 'success')
   conditions.push({
-    description: 'Commit status success',
+    description: 'The PR\'s HEAD commit status is not success (excludes prowl statuses)',
+    id: 'statusSuccess',
     pass: refStatusSuccess,
     value: refStatusSuccess
   })
@@ -76,18 +80,24 @@ const prPounceStatus = async prowl => {
     approvedReviewers.push(pr.user.login)
   }
   // check this generated list against configuration
-  const approved = config.reviewerGroups.every(reviewerGroup => {
-    return reviewerGroup.reviewers.some(reviewer => {
+  const unapprovedGroups = config.reviewerGroups.filter(reviewerGroup => {
+    return !reviewerGroup.reviewers.some(reviewer => {
       return approvedReviewers.includes(reviewer)
     })
   })
+  const approved = unapprovedGroups.length === 0
+  const description = unapprovedGroups.reduce(
+    (desc, group) => {
+      const descReviewers = group.reviewers.reduce((rs, reviewer) => `${rs}\n    - ${reviewer}`, '')
+      return `${desc}\n  - ${group.id}${descReviewers}`
+    },
+    'This PR requires more reviews. At least one person from each group is required:'
+  )
   conditions.push({
-    description: 'Required reviewers approved',
+    description,
+    id: 'reviewersApproved',
     pass: approved,
-    value: {
-      approved: approvedReviewers,
-      required: config.reviewerGroups
-    }
+    value: approvedReviewers
   })
 
   // PR labels
@@ -95,7 +105,8 @@ const prPounceStatus = async prowl => {
     .map(label => label.name)
     .filter(label => _.includes(config.not_ready_labels, label))
   conditions.push({
-    description: 'PR is not labelled as not ready',
+    description: 'PR is labelled as in progress',
+    id: 'labelWip',
     pass: notReadyLabels.length < 1,
     value: notReadyLabels
   })
