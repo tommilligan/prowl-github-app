@@ -5,6 +5,7 @@ const getCombinedStatusForRef = require('./api/getCombinedStatusForRef')
 const getContentConfig = require('./api/getContentConfig')
 const getFiles = require('./api/getFiles')
 const getReviews = require('./api/getReviews')
+const getReviewRequests = require('./api/getReviewRequests')
 const merge = require('./api/merge')
 const pullRequest = require('./api/pullRequest')
 const searchIssues = require('./api/searchIssues')
@@ -53,6 +54,7 @@ function mockGithub () {
     pullRequests: {
       get: mockApi(pullRequest),
       getFiles: mockApi(getFiles),
+      getReviewRequests: mockApi(getReviewRequests),
       getReviews: mockApi(getReviews),
       merge: mockApi(merge)
     },

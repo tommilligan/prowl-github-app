@@ -80,6 +80,7 @@ const prPounceStatus = async prowl => {
   if (config.author_implicit_reviewer) {
     approvedReviewers.push(pr.user.login)
   }
+  approvedReviewers = _.uniq(approvedReviewers)
   // check this generated list against configuration
   // for each group
   const unapprovedGroups = config.reviewerGroups.filter(reviewerGroup => {
@@ -104,6 +105,29 @@ const prPounceStatus = async prowl => {
     id: 'reviewersApproved',
     pass: approved,
     value: approvedReviewers
+  })
+
+  // Outstanding requested reviews
+  const prReviewRequests = await context.github.paginate(
+    context.github.pullRequests.getReviewRequests(
+      context.repo({ number: pr.number, per_page: 100 })
+    ),
+    res => res.data.users
+  )
+  const requestedUsers = prReviewRequests
+    .map(reviewRequest => reviewRequest.login)
+  const notApprovedUsers = prReviews
+    .filter(review => {
+      const { commit_id: commitId, state } = review
+      return commitId === pr.head.sha && state !== 'APPROVED'
+    })
+    .map(review => review.user.login)
+  const outstandingUsers = requestedUsers.concat(notApprovedUsers)
+  conditions.push({
+    description: 'PR has outstanding reviews',
+    id: 'reviewersOutstanding',
+    pass: outstandingUsers.length < 1,
+    value: outstandingUsers
   })
 
   // PR labels
