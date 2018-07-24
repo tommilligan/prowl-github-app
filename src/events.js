@@ -51,12 +51,8 @@ const pullRequestReview = async prowl => {
   const { context } = prowl
   const { pull_request: pr, review } = context.payload
 
-  if (
-    review.state === 'approved' &&
-    pr.state === 'open' &&
-    // review is at HEAD of the PR
-    review.commit_id === pr.head.sha
-  ) {
+  // review is at HEAD of the PR
+  if (review.commit_id === pr.head.sha) {
     // setup logger
     const prowlWithLog = withLog({
       ...prowl,
@@ -71,17 +67,13 @@ const pullRequest = async prowl => {
   const { context } = prowl
   const { pull_request: pr, action } = context.payload
 
-  if (pr.state === 'open') {
-    // if we need to recheck a pr
-    // setup logger
-    const prowlWithLog = withLog({
-      ...prowl,
-      pr
-    })
-    prowlWithLog.log.info(`PR State: ${action} ${pr.state}`)
-
-    return withConfig(logic.prMergeTry, prowlWithLog)
-  }
+  // setup logger
+  const prowlWithLog = withLog({
+    ...prowl,
+    pr
+  })
+  prowlWithLog.log.info(`PR State: ${action} ${pr.state}`)
+  return withConfig(logic.prMergeTry, prowlWithLog)
 }
 
 const status = async prowl => {
@@ -89,8 +81,7 @@ const status = async prowl => {
   const { state, sha, repository } = context.payload
   const repo = repository.full_name
 
-  if (state === 'success' && !utils.isOwnContext(context.payload.context)) {
-    // if the status update was a success
+  if (!utils.isOwnContext(context.payload.context)) {
     // search for PRs containing the commit
     const q = `${sha} repo:${repo} type:pr`
     const prs = await context.github.paginate(
