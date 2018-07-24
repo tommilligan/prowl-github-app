@@ -58,9 +58,20 @@ describe('PR merge conditions', () => {
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
     })
     it('PR with no approving reviews when required', async () => {
-      // Add another review that is not approved
+      // Modify review to be not approved
       const reviews = _.cloneDeep(getReviews)
       reviews.data[0].state = 'CHANGES_REQUESTED'
+      github.pullRequests.getReviews = mockApi(reviews)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
+    it('PR with an outstanding review, even though not required', async () => {
+      // Add another review that is not approved
+      const reviews = _.cloneDeep(getReviews)
+      reviews.data.push(_.cloneDeep(reviews.data[0]))
+      reviews.data[1].state = 'CHANGES_REQUESTED'
       github.pullRequests.getReviews = mockApi(reviews)
       robot = mockRobot(github)
 

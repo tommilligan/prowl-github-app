@@ -80,6 +80,7 @@ const prPounceStatus = async prowl => {
   if (config.author_implicit_reviewer) {
     approvedReviewers.push(pr.user.login)
   }
+  approvedReviewers = _.uniq(approvedReviewers)
   // check this generated list against configuration
   // for each group
   const unapprovedGroups = config.reviewerGroups.filter(reviewerGroup => {
@@ -104,6 +105,19 @@ const prPounceStatus = async prowl => {
     id: 'reviewersApproved',
     pass: approved,
     value: approvedReviewers
+  })
+
+  // Outstanding requested reviews
+  let notApprovedReviews = prReviews
+    .filter(review => {
+      const { commit_id: commitId, state } = review
+      return commitId === pr.head.sha && state !== 'APPROVED'
+    })
+  conditions.push({
+    description: 'PR has outstanding reviews',
+    id: 'reviewersOutstanding',
+    pass: notApprovedReviews.length < 1,
+    value: notApprovedReviews.map(review => review.user.login)
   })
 
   // PR labels
