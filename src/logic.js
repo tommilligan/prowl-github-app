@@ -94,9 +94,9 @@ const prPounceStatus = async prowl => {
   const description = unapprovedGroups.reduce(
     (desc, group) => {
       const descReviewers = group.reviewers.reduce((rs, reviewer) => `${rs}\n    - ${reviewer}`, '')
-      return `${desc}\n  - ${group.id}${descReviewers}`
+      return `${desc}\n  - ${group.id} *(${group.count} required)*${descReviewers}`
     },
-    'This PR requires more reviews. At least one person from each group is required:'
+    'This PR requires more reviews:'
   )
   conditions.push({
     description,
