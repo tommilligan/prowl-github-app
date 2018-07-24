@@ -19,20 +19,6 @@ describe('stale PR', () => {
       await robot.receive(statusSuccess)
       expect(github.search.issues).toHaveBeenCalledTimes(1)
     })
-    it('failure does not trigger issues search', async () => {
-      // Trigger bad event payload
-      const status = _.cloneDeep(statusSuccess)
-      status.payload.state = 'failure'
-      await robot.receive(status)
-      expect(github.search.issues).toHaveBeenCalledTimes(0)
-    })
-    it('pending does not trigger issues search', async () => {
-      // Trigger bad event payload
-      const status = _.cloneDeep(statusSuccess)
-      status.payload.state = 'pending'
-      await robot.receive(status)
-      expect(github.search.issues).toHaveBeenCalledTimes(0)
-    })
     it('prowl/ namespace status does not trigger issues search', async () => {
       // Trigger bad event payload
       const status = _.cloneDeep(statusSuccess)
