@@ -80,11 +80,16 @@ const prPounceStatus = async prowl => {
     approvedReviewers.push(pr.user.login)
   }
   // check this generated list against configuration
+  // for each group
   const unapprovedGroups = config.reviewerGroups.filter(reviewerGroup => {
-    return !reviewerGroup.reviewers.some(reviewer => {
+    // find matching approved reviewers
+    const approvers = reviewerGroup.reviewers.filter(reviewer => {
       return approvedReviewers.includes(reviewer)
     })
+    // return any groups that do not meet the reviewer criteria
+    return approvers.length < reviewerGroup.count
   })
+  // only approved if we have no outstanding groups to approve
   const approved = unapprovedGroups.length === 0
   const description = unapprovedGroups.reduce(
     (desc, group) => {
