@@ -22,7 +22,7 @@ Once installed (see below), prowl will run in the background. You should not nee
 
 ### Commands
 
-If you want to check on what it's thinking, you can summon it in a PR with a command.
+If you want to check on what prowl is thinking, you can summon it in a PR with a command.
 Commands are comments with **exactly**:
 - `prowl status`: quickly get the status of the PR right now
 - `prowl touch`: trigger a full recheck. Should happen automatically
@@ -35,13 +35,22 @@ Debugging:
 - `prowl id`: show the GitHub app id of this bot
 - `prowl version`: show the running version of prowl
 
+### Statuses
+
+If using prowl to set statuses, they have the following meaning:
+- `success`: PR passed all criteria for merge. See use as a [required status check](https://help.github.com/articles/about-required-status-checks/) 
+- `failure`: PR did not pass one or more criteria.
+- `pending`: prowl is aware of a recent change, and is
+  - waiting for the max time specified in `pounce.check_delay`
+  - talking to the GitHub API
+
 ### Configuration
 
 Prowl looks for `.prowl.yml` in your repo's default branch (usually `master`). No action will be taken unless a valid configuration is found.
 
 Prowl can watch multiple PR `targets` . A PR matching `stalk` will be reviwed on each update - when `pounce` if fulfilled, the PR will be merged.
 
-If multiple targets are stalked in a single PR, prowl will combine configurations together using the accumulators mentioned.
+If multiple targets are stalked in a single PR, prowl will combine configurations together using the accumulators mentioned below. 
 Currently how multiple branches are combined is not configurable.
 
 ```yaml
