@@ -2,6 +2,7 @@ const _ = require('lodash')
 
 const {mockRobot, mockGithub, mockApi} = require('./utils')
 
+const getContentConfig = require('./api/getContentConfig')
 const getCombinedStatusForRef = require('./api/getCombinedStatusForRef')
 const getReviews = require('./api/getReviews')
 const pullRequest = require('./api/pullRequest')
@@ -86,6 +87,59 @@ describe('PR merge conditions', () => {
 
       await robot.receive(pullRequestReopened)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
+    it('PR that requires multiple reviewers', async () => {
+      const config = getContentConfig(`
+version: '0.1.0'
+targets:
+  - id: markdown
+    stalk:
+      paths:
+        - "**/*.md"
+      base: master
+    pounce:
+      auto_pounce: true
+      check_delay: 0
+      commit_message_pr_number: true
+      reviewers:
+        - tommilligan
+        - tommilligan-plutoflume
+      reviewer_count: 9000
+      not_ready_labels:
+        - WIP
+`
+      )
+      github.repos.getContent = mockApi(config)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
+    it('PR that requires 0 reviewers will always pass', async () => {
+      const config = getContentConfig(`
+version: '0.1.0'
+targets:
+  - id: markdown
+    stalk:
+      paths:
+        - "**/*.md"
+      base: master
+    pounce:
+      auto_pounce: true
+      check_delay: 0
+      commit_message_pr_number: true
+      reviewers:
+        - spam
+      reviewer_count: 0
+      not_ready_labels:
+        - WIP
+`
+      )
+      github.repos.getContent = mockApi(config)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -55,7 +55,7 @@ function summariseTargets (targets) {
       })
       .map(target => {
         return {
-          count: target.pounce.reviewer_count || 1,
+          count: target.pounce.reviewer_count !== undefined ? target.pounce.reviewer_count : 0,
           id: target.id,
           reviewers: target.pounce.reviewers
         }
