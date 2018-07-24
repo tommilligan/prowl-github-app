@@ -81,18 +81,23 @@ const prPounceStatus = async prowl => {
     approvedReviewers.push(pr.user.login)
   }
   // check this generated list against configuration
+  // for each group
   const unapprovedGroups = config.reviewerGroups.filter(reviewerGroup => {
-    return !reviewerGroup.reviewers.some(reviewer => {
+    // find matching approved reviewers
+    const approvers = reviewerGroup.reviewers.filter(reviewer => {
       return approvedReviewers.includes(reviewer)
     })
+    // return any groups that do not meet the reviewer criteria
+    return approvers.length < reviewerGroup.count
   })
+  // only approved if we have no outstanding groups to approve
   const approved = unapprovedGroups.length === 0
   const description = unapprovedGroups.reduce(
     (desc, group) => {
       const descReviewers = group.reviewers.reduce((rs, reviewer) => `${rs}\n    - ${reviewer}`, '')
-      return `${desc}\n  - ${group.id}${descReviewers}`
+      return `${desc}\n  - ${group.id} *(${group.count} required)*${descReviewers}`
     },
-    'This PR requires more reviews. At least one person from each group is required:'
+    'This PR requires more reviews:'
   )
   conditions.push({
     description,

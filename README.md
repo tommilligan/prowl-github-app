@@ -79,6 +79,9 @@ targets:
       reviewers:
         - tommilligan
         - octocat  
+      # number of reviewers from the group whose approval is required
+      # default: 1
+      reviewer_count: 2
 
       # action (currently merge|status)
       # if set to 'status', set this as a required status check on your protected branch
