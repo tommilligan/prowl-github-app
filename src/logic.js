@@ -108,16 +108,26 @@ const prPounceStatus = async prowl => {
   })
 
   // Outstanding requested reviews
-  let notApprovedReviews = prReviews
+  const prReviewRequests = await context.github.paginate(
+    context.github.pullRequests.getReviewRequests(
+      context.repo({ number: pr.number, per_page: 100 })
+    ),
+    res => res.data.users
+  )
+  const requestedUsers = prReviewRequests
+    .map(reviewRequest => reviewRequest.login)
+  const notApprovedUsers = prReviews
     .filter(review => {
       const { commit_id: commitId, state } = review
       return commitId === pr.head.sha && state !== 'APPROVED'
     })
+    .map(review => review.user.login)
+  const outstandingUsers = requestedUsers.concat(notApprovedUsers)
   conditions.push({
     description: 'PR has outstanding reviews',
     id: 'reviewersOutstanding',
-    pass: notApprovedReviews.length < 1,
-    value: notApprovedReviews.map(review => review.user.login)
+    pass: outstandingUsers.length < 1,
+    value: outstandingUsers
   })
 
   // PR labels
