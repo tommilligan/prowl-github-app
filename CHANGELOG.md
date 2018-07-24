@@ -2,8 +2,30 @@
 
 ## next
 
+- smart fast fail on some events
+
+## 1.3.0
+
 ### Features
 - clubhouse title smart reformatting
+  - reformats GitHub's auto formatted branch name
+  - pulls ticket numbers from title or branch name
+- prettified output of `prowl status` command
+- added optional `reviewer_count` with default value of `1`
+
+### Enhancements
+
+- links to readme from the `Details` link in a prowl commit status
+
+### Bugfixes
+
+- perform a check on all events to ensure `failure` statuses are always calculated
+
+## 1.2.1
+
+### Bugfixes
+
+- version bump missed
 
 
 ## 1.2.0
