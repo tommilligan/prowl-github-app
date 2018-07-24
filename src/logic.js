@@ -9,6 +9,7 @@ const _ = require('lodash')
 
 const actions = require('./actions')
 const commentBodies = require('./commentBodies')
+const constants = require('./constants')
 const utils = require('./utils')
 
 const prPounceStatus = async prowl => {
@@ -129,6 +130,11 @@ const prMergeTry = async (prowl, command = false) => {
   const { config } = prowl
   const { checkDelay, stalk } = config
 
+  const statusBase = {
+    context: utils.ownContext('merge'),
+    target_url: constants.LINK_README_COMMANDS
+  }
+
   if (
     // There are applicable rules for this PR
     stalk &&
@@ -141,7 +147,7 @@ const prMergeTry = async (prowl, command = false) => {
         const status = {
           state: 'pending',
           description: 'Prowl is stalking this PR...',
-          context: utils.ownContext('merge')
+          ...statusBase
         }
         await actions.prStatus(prowl, status)
         break
@@ -164,8 +170,8 @@ const prMergeTry = async (prowl, command = false) => {
         case 'status': {
           const status = {
             state: 'success',
-            description: 'Ready for merge. `prowl merge` to execute.',
-            context: utils.ownContext('merge')
+            description: 'Ready for merge.',
+            ...statusBase
           }
           await actions.prStatus(prowl, status)
           break
@@ -177,8 +183,8 @@ const prMergeTry = async (prowl, command = false) => {
         case 'status': {
           const status = {
             state: 'failure',
-            description: 'Not ready for merge. `prowl status` for details, `prowl touch` to recheck.',
-            context: utils.ownContext('merge')
+            description: 'Not ready for merge.',
+            ...statusBase
           }
           await actions.prStatus(prowl, status)
           break

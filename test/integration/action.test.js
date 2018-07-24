@@ -55,14 +55,16 @@ targets:
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
+        'target_url': 'https://github.com/tommilligan/prowl-github-app#use',
         'state': 'pending'
       })
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
-        'description': 'Ready for merge. `prowl merge` to execute.',
+        'description': 'Ready for merge.',
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
+        'target_url': 'https://github.com/tommilligan/prowl-github-app#use',
         'state': 'success'
       })
     })
@@ -76,10 +78,11 @@ targets:
       expect(github.repos.createStatus).toHaveBeenCalledTimes(2)
       expect(github.repos.createStatus).toHaveBeenCalledWith({
         'context': 'prowl/merge',
-        'description': 'Not ready for merge. `prowl status` for details, `prowl touch` to recheck.',
+        'description': 'Not ready for merge.',
         'owner': 'tommilligan',
         'repo': 'prowl-target-stage',
         'sha': 'ca6b8c30cc278e3ed5727b4dbbc927e033d2fd72',
+        'target_url': 'https://github.com/tommilligan/prowl-github-app#use',
         'state': 'failure'
       })
       expect(github.issues.createComment).toHaveBeenCalledTimes(0)
