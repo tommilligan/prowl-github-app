@@ -20,6 +20,7 @@
 ### Bugfixes
 
 - perform a check on all events to ensure `failure` statuses are always calculated
+- fail if there are outstanding reviews with no response
 
 ## 1.2.1
 
