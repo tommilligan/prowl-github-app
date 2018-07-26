@@ -8,6 +8,7 @@ const getReviews = require('./api/getReviews')
 const getReviewRequests = require('./api/getReviewRequests')
 const merge = require('./api/merge')
 const pullRequest = require('./api/pullRequest')
+const getRateLimit = require('./api/getRateLimit')
 const searchIssues = require('./api/searchIssues')
 
 /**
@@ -50,6 +51,9 @@ function mockGithub () {
       createComment: mockApi({
         did: 'create comment'
       })
+    },
+    misc: {
+      getRateLimit: mockApi(getRateLimit)
     },
     pullRequests: {
       get: mockApi(pullRequest),

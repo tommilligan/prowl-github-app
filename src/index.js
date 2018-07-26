@@ -3,6 +3,7 @@
  * GitHub events trigger prowl events.
  */
 
+const actions = require('./actions')
 const events = require('./events')
 const utils = require('./utils')
 
@@ -11,7 +12,8 @@ module.exports = robot => {
 
   // log all events we hear
   robot.on(`*`, async context => {
-    return context.log(`event: ${context.event.event}`)
+    context.log(`event: ${context.event.event}`)
+    await actions.logRateLimitThrottled({robot, context})
   })
 
   // event specific listeners
