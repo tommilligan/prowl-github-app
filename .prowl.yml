@@ -17,4 +17,6 @@ targets:
       merge_method: merge
       reviewers:
         - tommilligan
+      not_ready_labels:
+        - WIP
 
