@@ -4,6 +4,16 @@
 
 - smart fast fail on some events
 
+## 1.3.1
+
+### Enhancements
+
+- periodically dump GitHub rate-limiting telemetry to logs
+
+### Bugfixes
+
+- only check most recent PR review for each user
+
 ## 1.3.0
 
 ### Features
