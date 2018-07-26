@@ -79,6 +79,29 @@ describe('PR merge conditions', () => {
       await robot.receive(pullRequestReopened)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
     })
+    it('failing reviews are superceeded by new same user reviews', async () => {
+      // Add another review that is not approved
+      const reviews = _.cloneDeep(getReviews)
+      reviews.data.push(_.cloneDeep(reviews.data[0]))
+      reviews.data[0].state = 'CHANGES_REQUESTED'
+      github.pullRequests.getReviews = mockApi(reviews)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
+    })
+    it('failing reviews are not superceeded by new different user reviews', async () => {
+      // Add another review that is not approved
+      const reviews = _.cloneDeep(getReviews)
+      reviews.data.push(_.cloneDeep(reviews.data[0]))
+      reviews.data[0].state = 'CHANGES_REQUESTED'
+      reviews.data[0].user.login = 'spam'
+      github.pullRequests.getReviews = mockApi(reviews)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
     it('PR with an outstanding review request', async () => {
       // Add another review that is not approved
       const reviews = _.cloneDeep(getReviewRequests)

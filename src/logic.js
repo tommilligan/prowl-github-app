@@ -63,12 +63,15 @@ const prPounceStatus = async prowl => {
 
   // PR reviews
   // get from API
-  const prReviews = await context.github.paginate(
+  let prReviews = await context.github.paginate(
     context.github.pullRequests.getReviews(
       context.repo({ number: pr.number, per_page: 100 })
     ),
     res => res.data
   )
+  // inverse chronological order for uniquing
+  prReviews.reverse()
+  prReviews = _.uniqBy(prReviews, prReview => prReview.user.login)
   // filter to approved only
   let approvedReviewers = prReviews
     .filter(review => {
