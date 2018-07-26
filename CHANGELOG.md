@@ -4,6 +4,12 @@
 
 - smart fast fail on some events
 
+## 1.3.2
+
+### Enhancements
+
+- improve wording and formatting of `prowl status`
+
 ## 1.3.1
 
 ### Enhancements
