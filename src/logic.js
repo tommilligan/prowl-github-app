@@ -96,12 +96,12 @@ const prPounceStatus = async prowl => {
   })
   // only approved if we have no outstanding groups to approve
   const approved = unapprovedGroups.length === 0
-  const description = unapprovedGroups.reduce(
+  let description = unapprovedGroups.reduce(
     (desc, group) => {
       const descReviewers = group.reviewers.reduce((rs, reviewer) => `${rs}\n    - ${reviewer}`, '')
       return `${desc}\n  - ${group.id} *(${group.count} required)*${descReviewers}`
     },
-    'This PR requires more reviews:'
+    'This PR requires the following approvals:'
   )
   conditions.push({
     description,
@@ -126,8 +126,15 @@ const prPounceStatus = async prowl => {
     })
     .map(review => review.user.login)
   const outstandingUsers = requestedUsers.concat(notApprovedUsers)
+
+  description = outstandingUsers.reduce(
+    (desc, user) => {
+      return `${desc}\n  - ${user}`
+    },
+    'Some reviewers have left comments, requested changes, or not yet left a review:'
+  )
   conditions.push({
-    description: 'PR has outstanding reviews',
+    description,
     id: 'reviewersOutstanding',
     pass: outstandingUsers.length < 1,
     value: outstandingUsers
