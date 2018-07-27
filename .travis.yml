@@ -5,6 +5,9 @@ services:
 language: node_js
 node_js:
   - "8.11"
+before_install:
+  - yarn global add greenkeeper-lockfile@1
+  - greenkeeper-lockfile-update
 install:
   - yarn --frozen-lockfile
   - mv .env.test .env
@@ -12,6 +15,7 @@ script:
   - yarn run test
 after_success:
   - |
+    greenkeeper-lockfile-upload
     # if we're on a master non-PR, deploy as latest
     if [[ ( $TRAVIS_BRANCH == "master" ) && ( $TRAVIS_PULL_REQUEST == "false" ) ]]; then
       ./scripts/deploy-master.sh || exit 1
