@@ -9,7 +9,7 @@
 [![Travis branch](https://img.shields.io/travis/tommilligan/prowl-github-app/master.svg)](https://travis-ci.org/tommilligan/prowl-github-app)
 [![codecov](https://codecov.io/gh/tommilligan/prowl-github-app/branch/master/graph/badge.svg)](https://codecov.io/gh/tommilligan/prowl-github-app)
 [![David](https://img.shields.io/david/tommilligan/prowl-github-app.svg)](https://david-dm.org/tommilligan/prowl-github-app)
-[![Docker Pulls](https://img.shields.io/docker/pulls/tommilligan/prowl-github-app.svg)](https://hub.docker.com/r/tommilligan/prowl-github-app/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/tommilligan/prowl-github-app.svg)](https://hub.docker.com/r/tommilligan/prowl-github-app/) [![Greenkeeper badge](https://badges.greenkeeper.io/tommilligan/prowl-github-app.svg)](https://greenkeeper.io/)
 
 
 Prowl is a stateless, declarative GitHub bot powered by [Probot](https://github.com/probot/probot). It listens for updates from your repositories, and merges pull requests only when your custom criteria are met. It works purely from the GitHub API, with no internal storage to manage. Power through your PR reviews, and let Prowl worry about merging to master.
