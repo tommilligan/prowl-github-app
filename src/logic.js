@@ -131,7 +131,7 @@ const prPounceStatus = async prowl => {
     (desc, user) => {
       return `${desc}\n  - ${user}`
     },
-    'Some reviewers have left comments, requested changes, or not yet left a review:'
+    'Some reviewers have requested changes, or not yet left a review:'
   )
   conditions.push({
     description,
