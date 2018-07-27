@@ -69,15 +69,18 @@ const prPounceStatus = async prowl => {
     ),
     res => res.data
   )
-  // inverse chronological order for uniquing
+  // get most recent reviews from each user for HEAD, excluding comments
+  prReviews = prReviews.filter(review => {
+    return (review.commit_id === pr.head.sha) &&
+      !_.includes(constants.GITHUB_PR_REVIEWS_STATES.IGNORE, review.state)
+  })
   prReviews.reverse()
   prReviews = _.uniqBy(prReviews, prReview => prReview.user.login)
-  // filter to approved only
+
+  // check we have enough approving reviews
+  // filter to passing only
   let approvedReviewers = prReviews
-    .filter(review => {
-      const { commit_id: commitId, state } = review
-      return commitId === pr.head.sha && state === 'APPROVED'
-    })
+    .filter(review => _.includes(constants.GITHUB_PR_REVIEWS_STATES.PASS, review.state))
     .map(review => review.user.login)
   // add author as a reviewer if author_implicit_reviewer is set
   if (config.author_implicit_reviewer) {
@@ -120,10 +123,7 @@ const prPounceStatus = async prowl => {
   const requestedUsers = prReviewRequests
     .map(reviewRequest => reviewRequest.login)
   const notApprovedUsers = prReviews
-    .filter(review => {
-      const { commit_id: commitId, state } = review
-      return commitId === pr.head.sha && state !== 'APPROVED'
-    })
+    .filter(review => !_.includes(constants.GITHUB_PR_REVIEWS_STATES.PASS, review.state))
     .map(review => review.user.login)
   const outstandingUsers = requestedUsers.concat(notApprovedUsers)
 
@@ -131,7 +131,7 @@ const prPounceStatus = async prowl => {
     (desc, user) => {
       return `${desc}\n  - ${user}`
     },
-    'Some reviewers have left comments, requested changes, or not yet left a review:'
+    'Some reviewers have requested changes, or not yet left a review:'
   )
   conditions.push({
     description,

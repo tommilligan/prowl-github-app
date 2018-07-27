@@ -4,6 +4,12 @@
 
 - smart fast fail on some events
 
+## 1.3.3
+
+### Bugfixes
+
+- ignore PR reviews with status COMMENTED or DISMISSED, rather that treating them as a fail
+
 ## 1.3.2
 
 ### Enhancements
