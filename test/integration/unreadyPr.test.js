@@ -79,6 +79,27 @@ describe('PR merge conditions', () => {
       await robot.receive(pullRequestReopened)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
     })
+    it('PR with comments only is classified as a fail', async () => {
+      // Add another review that is not approved
+      const reviews = _.cloneDeep(getReviews)
+      reviews.data[0].state = 'COMMENTED'
+      github.pullRequests.getReviews = mockApi(reviews)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
+    it('PR with comments additionally is classified as a pass', async () => {
+      // Add another review that is not approved
+      const reviews = _.cloneDeep(getReviews)
+      reviews.data.push(_.cloneDeep(reviews.data[0]))
+      reviews.data[1].state = 'COMMENTED'
+      github.pullRequests.getReviews = mockApi(reviews)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
+    })
     it('failing reviews are superceeded by new same user reviews', async () => {
       // Add another review that is not approved
       const reviews = _.cloneDeep(getReviews)
