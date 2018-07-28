@@ -3567,7 +3567,7 @@ private@^0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
 
-probot@^7.0.0:
+probot@7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/probot/-/probot-7.0.0.tgz#54c54263d50dc0b5953c57fbccc5d8dd21c97f8c"
   dependencies:
