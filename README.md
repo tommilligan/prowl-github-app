@@ -179,6 +179,7 @@ Your instance of prowl needs to be accessible at a public URL such as:
 You will need to set environment variables as described in `.env.example`. In production, you'll also want:
 - `LOG_FORMAT=json` for structured log draining
 - `PRIVATE_KEY=$(cat <your/private-key.pem>)`, [see here](https://probot.github.io/docs/deployment/#deploy-the-app). In development, just add a `*.pem` file to your working directory.
+- `INSTALLATION_TOKEN_TTL=3300`, this reduces the cache time of probot's auth tokens. This value should be 3600 (one hour) minus your longest possible check time (see `pounce.check_delay`).
 
 #### GitHub Register
 

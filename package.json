@@ -1,6 +1,6 @@
 {
   "name": "prowl-github-app",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "",
   "author": "Tom Milligan <code@tommilligan.net> (https://prowl-github-app.herokuapp.com)",
   "license": "ISC",
@@ -24,7 +24,7 @@
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.10",
     "minimatch": "^3.0.4",
-    "probot": "^7.0.0",
+    "probot": "https://github.com/tommilligan/probot#69f5b6db8c4532ab68ad2819eddfbb995a6be81e",
     "url-join": "^4.0.0"
   },
   "devDependencies": {
