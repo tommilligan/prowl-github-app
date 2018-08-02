@@ -4,6 +4,12 @@
 
 - smart fast fail on some events
 
+## 1.3.4
+
+### Bugfixes
+
+- respect the env var `INSTALLATION_TOKEN_TTL` to remove occasional `401 Unauthorized` errors on long running tasks
+
 ## 1.3.3
 
 ### Bugfixes
