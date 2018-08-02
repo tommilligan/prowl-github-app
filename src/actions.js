@@ -39,7 +39,7 @@ async function prError (prowl, e) {
   prowl.log.warn(e)
   prowl.log.warn(`Error loading prowl config`)
   prComment(prowl, commentBodies.error({
-    event: prowl.context.event.event,
+    event: prowl.context.event.name,
     pr: prowl.pr.url,
     message: e.message
   }))
