@@ -4,6 +4,9 @@ FROM node:8.11-alpine
 RUN mkdir -p /usr/src/app/src
 WORKDIR /usr/src/app
 
+# Install build dependencies
+RUN apk add --no-cache git
+
 # Copy required project files
 COPY package.json yarn.lock .env.example ./
 COPY src/ ./src/
