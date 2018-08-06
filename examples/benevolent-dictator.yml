@@ -1,3 +1,4 @@
+
 version: '0.1.0'
 
 targets:
@@ -9,3 +10,7 @@ targets:
     pounce:
       reviewers:
         - jerry-the-benevolent-dictator
+      # when submitting a PR, jerry will not require another approver
+      # but everyone else will require jerry's approval
+      author_implicit_reviewer: true
+

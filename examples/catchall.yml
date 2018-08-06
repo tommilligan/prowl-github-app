@@ -1,0 +1,27 @@
+
+version: '0.1.0'
+
+targets:
+  # Everything except the db directory
+  # We could use bash expansion syntax like "!{db,credentials}/**/*"
+  # to ignore multiple directories
+  - id: app
+    stalk:
+      paths:
+        - "!db/**/*"
+      base: master
+    pounce:
+      reviewers:
+        - tom
+        - dave
+
+  - id: db
+    stalk:
+      paths:
+        - "db/**/*"
+      base: master
+    pounce:
+      reviewers:
+        - sam
+        - juliet
+
