@@ -1,8 +1,8 @@
 # Changelog
 
-## next
+## 1.4.0
 
-- smart fast fail on some events
+- support teams by flattening nested reviewers automatically
 
 ## 1.3.4
 
