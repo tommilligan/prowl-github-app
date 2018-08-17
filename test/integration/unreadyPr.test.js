@@ -209,5 +209,39 @@ targets:
       await robot.receive(pullRequestReopened)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
     })
+    it('PR with nested teams should pass', async () => {
+      const config = getContentConfig(`
+version: '0.1.0'
+
+_team0: &team0
+  - bar
+  - foo
+_team1: &team1
+  - tommilligan
+  - spam
+
+targets:
+  - id: markdown
+    stalk:
+      paths:
+        - "**/*.md"
+      base: master
+    pounce:
+      auto_pounce: true
+      check_delay: 0
+      commit_message_pr_number: true
+      reviewers:
+        - *team0
+        - *team1
+      not_ready_labels:
+        - WIP
+`
+      )
+      github.repos.getContent = mockApi(config)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
+    })
   })
 })
