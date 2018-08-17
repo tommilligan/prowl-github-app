@@ -243,5 +243,42 @@ targets:
       await robot.receive(pullRequestReopened)
       expect(github.pullRequests.merge).toHaveBeenCalledTimes(1)
     })
+    it('PR with ignored paths should be ignored', async () => {
+      const config = getContentConfig(`
+version: '0.1.0'
+
+_team0: &team0
+  - bar
+  - foo
+_team1: &team1
+  - tommilligan
+  - spam
+
+targets:
+  - id: markdown
+    stalk:
+      paths:
+        - "**/*.md"
+        - "**/*.some-other-extension"
+      paths_ignore:
+        - "spam.md"
+        - "foo.md"
+      base: master
+    pounce:
+      auto_pounce: true
+      check_delay: 0
+      commit_message_pr_number: true
+      reviewers:
+        - tommilligan
+      not_ready_labels:
+        - WIP
+`
+      )
+      github.repos.getContent = mockApi(config)
+      robot = mockRobot(github)
+
+      await robot.receive(pullRequestReopened)
+      expect(github.pullRequests.merge).toHaveBeenCalledTimes(0)
+    })
   })
 })

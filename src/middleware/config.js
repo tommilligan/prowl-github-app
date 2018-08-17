@@ -89,7 +89,7 @@ async function calculatePRConfig (prowl, config) {
     })
     // by filepath
     .filter(target => {
-      return utils.minimatchCartesian(dirtyFilePaths, target.stalk.paths, {
+      return utils.minimatchCartesian(dirtyFilePaths, target.stalk.paths, target.stalk.paths_ignore || [], {
         dot: true
       })
     })
