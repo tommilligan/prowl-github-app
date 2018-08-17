@@ -1,6 +1,14 @@
 # Changelog
 
+## 1.5.0
+
+### Features
+
+- add the `ignore_paths` key to allow partial ignoring of complex targets
+
 ## 1.4.0
+
+### Features
 
 - support teams by flattening nested reviewers automatically
 
