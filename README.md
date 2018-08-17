@@ -69,6 +69,10 @@ targets:
       # prowl uses the minimatch library internally, see below for details
       paths:
         - "src/**/*"
+      # exceptions to the above paths. Suppresses triggering on these files
+      # default: [] (no exceptions)
+      paths_ignore:
+        - "src/notes/**/*"
       # PR base branch
       base: master
 
