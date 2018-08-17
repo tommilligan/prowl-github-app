@@ -57,7 +57,7 @@ function summariseTargets (targets) {
         return {
           count: target.pounce.reviewer_count !== undefined ? target.pounce.reviewer_count : 1,
           id: target.id,
-          reviewers: target.pounce.reviewers
+          reviewers: _.flattenDeep(target.pounce.reviewers)
         }
       }),
     stalk: targets.length > 0
