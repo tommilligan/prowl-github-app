@@ -1,0 +1,43 @@
+version: '0.1.0'
+
+_team_frontend: &team-frontend
+  - frontend-lead-user
+  - frontend-dev-1
+  - frontend-dev-2
+_team_backend: &team-backend
+  - backend-lead-user
+  - backend-dev-1
+  - backend-dev-2
+
+targets:
+  - id: frontend
+    stalk:
+      paths:
+        - "ui/**/*"
+      base: master
+    pounce:
+      reviewers:
+        # Insert our team list here
+        <<: *team-frontend
+
+  - id: backend
+    stalk:
+      paths:
+        - "api/**/*"
+      base: master
+    pounce:
+      check_delay: 20
+      reviewers:
+        <<: *team-backend
+
+  - id: docs
+    stalk:
+      paths:
+        - "**/*.{md,txt}"
+      base: master
+    pounce:
+      # Prowl will flatten any nested reviewers automatically
+      reviewers:
+        - *team-frontend
+        - *team-backend
+

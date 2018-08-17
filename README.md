@@ -76,6 +76,7 @@ targets:
     pounce:
       # PR reviewers. Only one approval from the list is required
       # default: [] (no reviews required)
+      # this list can be nested (see examples/teams.yml)
       reviewers:
         - tommilligan
         - octocat  
