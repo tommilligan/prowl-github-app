@@ -31,7 +31,13 @@
     "jest": "^23.4.1",
     "nodemon": "^1.17.2",
     "smee-client": "^1.0.1",
-    "standard": "^11.0.1"
+    "standard": "^11.0.1",
+    "stryker": "^0.29.1",
+    "stryker-api": "^0.21.0",
+    "stryker-baseline-reporter": "^1.0.3",
+    "stryker-html-reporter": "^0.16.1",
+    "stryker-javascript-mutator": "^0.9.1",
+    "stryker-jest-runner": "^1.2.0"
   },
   "engines": {
     "node": ">= 8.3.0"
