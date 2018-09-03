@@ -3,7 +3,7 @@ module.exports = function(config) {
     testRunner: "jest",
     mutator: "javascript",
     transpilers: [],
-    reporters: ["html", "baseline", "clear-text", "progress", "dashboard"],
+    reporters: ["html", "baseline", "clear-text", "progress"],
     packageManager: "yarn",
     coverageAnalysis: "off",
     mutate: ["src/**/*.js"]
