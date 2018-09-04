@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-const {mockRobot, mockGithub} = require('./utils')
+const { mockRobot, mockGithub } = require('./utils')
 
 const commandStatus = require('./payloads/issueCommentCreated')
 

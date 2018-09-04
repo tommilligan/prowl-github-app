@@ -1,4 +1,4 @@
-const {mockRobot, mockGithub} = require('./utils')
+const { mockRobot, mockGithub } = require('./utils')
 
 const issueCommentCreated = require('./payloads/issueCommentCreated')
 const pullRequestReview = require('./payloads/pullRequestReview')

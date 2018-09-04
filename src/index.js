@@ -13,7 +13,7 @@ module.exports = robot => {
   // log all events we hear
   robot.on(`*`, async context => {
     context.log(`event: ${context.event.name}`)
-    await actions.logRateLimitThrottled({robot, context})
+    await actions.logRateLimitThrottled({ robot, context })
   })
 
   // event specific listeners
