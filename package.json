@@ -25,7 +25,7 @@
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.10",
     "minimatch": "^3.0.4",
-    "probot": "https://github.com/tommilligan/probot#69f5b6db8c4532ab68ad2819eddfbb995a6be81e",
+    "probot": "^7.1.0",
     "url-join": "^4.0.0"
   },
   "devDependencies": {
