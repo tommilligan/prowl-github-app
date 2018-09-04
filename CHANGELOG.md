@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.0
+
+### Bugfixes
+
+- updated permissions to reflect new and existing GitHub scopes
+  - upgraded commit statuses to `read & write`
+  - upgraded pull requests to `read & write`
+  - downgraded issues to `read`
+- updated underlying `probot` version to `7.1.0`
+
 ## 1.5.0
 
 ### Features
