@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-const {mockRobot, mockGithub, mockApi} = require('./utils')
+const { mockRobot, mockGithub, mockApi } = require('./utils')
 
 const getContentConfig = require('./api/getContentConfig')
 const getReviews = require('./api/getReviews')

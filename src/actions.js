@@ -49,9 +49,9 @@ async function logRateLimit (prowl) {
   const { context } = prowl
   context.log.debug('fetching rate limit stats')
   const rateLimit = await prowl.context.github.misc.getRateLimit({})
-  context.log.info({githubRateLimit: rateLimit.data.resources}, 'fetched rate limit stats')
+  context.log.info({ githubRateLimit: rateLimit.data.resources }, 'fetched rate limit stats')
 }
-const logRateLimitThrottled = _.throttle(logRateLimit, 300000, {leading: true, trailing: false})
+const logRateLimitThrottled = _.throttle(logRateLimit, 300000, { leading: true, trailing: false })
 
 /**
  * If we're not in dryRun, call action. Otherwise, comment message.
