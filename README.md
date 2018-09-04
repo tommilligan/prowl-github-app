@@ -196,16 +196,16 @@ You'll need to set up a private GitHub app to point to this instance, with the f
 | Permission             | Access               | Purpose                                 |
 | ---------------------- | -------------------- | --------------------------------------- |
 | Repository contents    | read & write         | read configuration, merge PRs           |
-| Issues                 | read & write         | read PR commands, write PR comments     |
-| Repository metadata    | read                 |                                         |
-| Pull requests          | read                 | read PR commit info, reviews            |
-| Commit statuses        | read                 | read commit CI status                   |
+| Issues                 | read                 | read prowl commands                     |
+| Repository metadata    | read                 | required for all apps                   |
+| Pull requests          | read & write         | PR commit info, reviews, comments       |
+| Commit statuses        | read & write         | commit CI status                        |
 
 - Events:
 
 | Event                  | Purpose                                 |
 | ---------------------- | --------------------------------------- |
-| Issue comment          | respond to PR commands                  |
+| Issue comment          | respond to prowl commands               |
 | Pull request           | check PRs when opened or updated        |
 | Pull request review    | check PRs after a successful review     |
 | Status                 | check PRs after CI passes               |
