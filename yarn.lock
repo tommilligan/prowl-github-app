@@ -4336,9 +4336,14 @@ semver-diff@^2.0.0:
   dependencies:
     semver "^5.0.3"
 
-"semver@2 || 3 || 4 || 5", semver@^5.0.3, semver@^5.1.0, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@~5.5.0:
+"semver@2 || 3 || 4 || 5", semver@^5.0.3, semver@^5.1.0, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0:
   version "5.5.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.1.tgz#7dfdd8814bdb7cabc7be0fb1d734cfb66c940477"
+
+semver@~5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
+  integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
 
 send@0.16.2:
   version "0.16.2"
@@ -4700,6 +4705,13 @@ stryker-api@^0.24.0:
   dependencies:
     tslib "~1.9.3"
 
+stryker-api@^0.24.1:
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/stryker-api/-/stryker-api-0.24.1.tgz#4d970a60a3c00101683df172a2dc7b182cab97d1"
+  integrity sha512-7ar/+f96KXokhy8sT8EotUjt0+7hyeMpDQTQklWwhOkT6EHWLGYA1VBnYsrkn/KfSzNF8i6lUArBIJnyyfkc7A==
+  dependencies:
+    tslib "~1.9.3"
+
 stryker-baseline-reporter@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/stryker-baseline-reporter/-/stryker-baseline-reporter-1.0.3.tgz#c127144796ce1896766840cd8c7f13c8202936b8"
@@ -4732,11 +4744,13 @@ stryker-javascript-mutator@^0.14.0:
     stryker-api "^0.24.0"
     tslib "~1.9.3"
 
-stryker-jest-runner@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/stryker-jest-runner/-/stryker-jest-runner-1.2.0.tgz#d9e7991d541a9fd0b415debdef093de3a4d00222"
+stryker-jest-runner@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/stryker-jest-runner/-/stryker-jest-runner-1.4.1.tgz#023c8bc83c179623f4cad8c88d9015608ee94c2f"
+  integrity sha512-LkFNqQ1ZDgjQ1TbYK6tcIhlxNU8a1JZc7T3gpkf+kbC/zwQMwYLTChuKWO69wpeQWXAdZjvV3ftpeiKYb3ZQog==
   dependencies:
-    semver "~5.5.0"
+    semver "~5.6.0"
+    stryker-api "^0.24.1"
 
 stryker@^0.29.1:
   version "0.29.1"
