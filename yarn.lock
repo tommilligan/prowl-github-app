@@ -99,10 +99,15 @@
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.1.2.tgz#85c5c47af6d244fab77bce6b9bd830e38c978409"
 
-"@babel/parser@^7.2.3", "@babel/parser@~7.2.0":
+"@babel/parser@^7.2.3":
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.2.3.tgz#32f5df65744b70888d17872ec106b02434ba1489"
   integrity sha512-0LyEcVlfCoFmci8mXx8A5oIkpkOgyo8dRHtxBnK9RRBwxO2+JZPNsqtVEZQ7mJFPxnXF9lfmU24mHOPI0qnlkA==
+
+"@babel/parser@~7.3.1":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.3.2.tgz#95cdeddfc3992a6ca2a1315191c1679ca32c55cd"
+  integrity sha512-QzNUC2RO1gadg+fs21fi0Uu0OuGNzRKEmgCxoLNzbCdoprLwjfmZwzUrpUNfJPaVRwBpDY47A17yYEGWyRelnQ==
 
 "@babel/template@7.0.0-beta.51":
   version "7.0.0-beta.51"
@@ -4688,6 +4693,13 @@ stryker-api@^0.21.0:
   dependencies:
     tslib "~1.9.3"
 
+stryker-api@^0.24.0:
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/stryker-api/-/stryker-api-0.24.0.tgz#791709cd3e6174cf676e13f79b73710ca9fc20f6"
+  integrity sha512-2A4ErZ9aG85UsHHVvOANJRZtNYxnikF3QRNT7QkfDBoDKZtYxaxVDuWDkwL+WQ2kN/7WMaM2lRxXGOyjZqTELQ==
+  dependencies:
+    tslib "~1.9.3"
+
 stryker-baseline-reporter@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/stryker-baseline-reporter/-/stryker-baseline-reporter-1.0.3.tgz#c127144796ce1896766840cd8c7f13c8202936b8"
@@ -4708,15 +4720,16 @@ stryker-html-reporter@^0.16.1:
     rimraf "~2.6.1"
     typed-html "~0.6.0"
 
-stryker-javascript-mutator@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/stryker-javascript-mutator/-/stryker-javascript-mutator-0.13.0.tgz#fff881df127a4ec4d694d75cbfd4454f9a1c43e6"
-  integrity sha512-G7iB6mLmfEF0y9u0c8VwE+DJvfY3nGX+1cskpSVVYKM4XB40z7jlA8Yhz38Qo5xqZVvCRAuU0W6nZi/7sQ4KdQ==
+stryker-javascript-mutator@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/stryker-javascript-mutator/-/stryker-javascript-mutator-0.14.0.tgz#49676934d1869fa6fe563cec2a915b190e22f0cc"
+  integrity sha512-2OQXBH8iAjH89srI7EpJ3gy6OT9gsadplNYt1ZDBSpTKp8oue9KehBA6NvVUQSIuDQqlVFSntTmE8Hu3U56+FQ==
   dependencies:
     "@babel/generator" "~7.2.0"
-    "@babel/parser" "~7.2.0"
+    "@babel/parser" "~7.3.1"
     "@babel/traverse" "~7.2.2"
     lodash "~4.17.4"
+    stryker-api "^0.24.0"
     tslib "~1.9.3"
 
 stryker-jest-runner@^1.2.0:
