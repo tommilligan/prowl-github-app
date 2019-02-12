@@ -34,7 +34,7 @@
     "stryker-baseline-reporter": "^1.0.3",
     "stryker-html-reporter": "^0.16.1",
     "stryker-javascript-mutator": "^0.14.0",
-    "stryker-jest-runner": "^1.2.0"
+    "stryker-jest-runner": "^1.4.1"
   },
   "engines": {
     "node": ">= 8.3.0"
