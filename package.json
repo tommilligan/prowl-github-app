@@ -1,13 +1,17 @@
 {
   "name": "prowl-github-app",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "",
   "author": "Tom Milligan <code@tommilligan.net> (https://prowl-github-app.herokuapp.com)",
   "license": "ISC",
   "repository": "https://github.com/tommilligan/prowl-github-app.git",
   "homepage": "https://github.com/tommilligan/prowl-github-app",
   "bugs": "https://github.com/tommilligan/prowl-github-app/issues",
-  "keywords": ["probot", "github", "probot-app"],
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
   "scripts": {
     "dev": "nodemon --exec \"npm start\"",
     "start": "probot run ./src/index.js",
@@ -40,7 +44,9 @@
     "node": ">= 8.3.0"
   },
   "standard": {
-    "env": ["jest"]
+    "env": [
+      "jest"
+    ]
   },
   "jest": {
     "collectCoverage": true,
