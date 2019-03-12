@@ -4,7 +4,6 @@
 
 ### Enhancements
 
-- update to `probot` version `9.0.0`
 - dependency updates
 
 ## 1.6.0
