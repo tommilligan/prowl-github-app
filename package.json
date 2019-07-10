@@ -18,7 +18,9 @@
     "lint": "standard --fix",
     "mutate": "stryker run",
     "test": "jest && standard",
-    "test:watch": "jest --watch --notify --notifyMode=change --coverage"
+    "test:watch": "jest --watch --notify --notifyMode=change --coverage",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "dotenv-safe": "^6.0.0",
@@ -26,7 +28,8 @@
     "lodash": "^4.17.10",
     "minimatch": "^3.0.4",
     "probot": "^7.1.0",
-    "url-join": "^4.0.0"
+    "url-join": "^4.0.0",
+    "snyk": "^1.192.4"
   },
   "devDependencies": {
     "jest": "^23.5.0",
@@ -52,5 +55,6 @@
     "collectCoverage": true,
     "coverageDirectory": "./coverage/",
     "testURL": "http://localhost/"
-  }
+  },
+  "snyk": true
 }
